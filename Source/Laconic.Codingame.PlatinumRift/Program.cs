@@ -1,46 +1,102 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Laconic.Codingame.PlatinumRift
 {
-    class Program
+    public class Program
     {
-        static void Main(String[] args)
+        static void Main()
         {
-            var inputs = Console.ReadLine().Split(' ');
-            var playerCount = int.Parse(inputs[0]); // the amount of players (2 to 4)
-            var myId = int.Parse(inputs[1]); // my player ID (0, 1, 2 or 3)
-            var zoneCount = int.Parse(inputs[2]); // the amount of zones on the map
-            var linkCount = int.Parse(inputs[3]); // the amount of links between all zones
-            for (var i = 0; i < zoneCount; i++)
-            {
-                inputs = Console.ReadLine().Split(' ');
-                var zoneId = int.Parse(inputs[0]); // this zone's ID (between 0 and zoneCount-1)
-                var platinumSource = int.Parse(inputs[1]); // the amount of Platinum this zone can provide per game turn
-            }
-            for (var i = 0; i < linkCount; i++)
-            {
-                inputs = Console.ReadLine().Split(' ');
-                var zone1 = int.Parse(inputs[0]);
-                var zone2 = int.Parse(inputs[1]);
-            }
+            var game = Game.Read();
 
             // game loop
             while (true)
             {
-                var platinum = int.Parse(Console.ReadLine()); // my available Platinum
-                for (var i = 0; i < zoneCount; i++)
-                {
-                    inputs = Console.ReadLine().Split(' ');
-                    var zId = int.Parse(inputs[0]); // this zone's ID
-                    var ownerId = int.Parse(inputs[1]); // the player who owns this zone (-1 otherwise)
-                    var podsP0 = int.Parse(inputs[2]); // player 0's PODs on this zone
-                    var podsP1 = int.Parse(inputs[3]); // player 1's PODs on this zone
-                    var podsP2 = int.Parse(inputs[4]); // player 2's PODs on this zone (always 0 for a two player game)
-                    var podsP3 = int.Parse(inputs[5]); // player 3's PODs on this zone (always 0 for a two or three player game)
-                }
+                game.ReadRound();
 
                 Console.WriteLine("WAIT");
                 Console.WriteLine("1 73");
+            }
+        }
+    }
+
+    public class Game
+    {
+        public int PlayersCount { get; set; }
+        public int MyPlayerId { get; set; }
+        public int MyPlatinum { get; set; }
+        public Zone[] Zones { get; set; }
+
+        public void ReadRound()
+        {
+            MyPlatinum = int.Parse(Console.ReadLine()); // my available Platinum
+
+            for (var i = 0; i < Zones.Length; i++)
+            {
+                var inputs = Console.ReadLine().Split(' ');
+                var id = int.Parse(inputs[0]); // this zone's ID
+
+                var zone = Zones[id];
+                zone.OwnerId = int.Parse(inputs[1]);
+                zone.Pods[0] = int.Parse(inputs[2]);
+                zone.Pods[1] = int.Parse(inputs[3]);
+                zone.Pods[2] = int.Parse(inputs[4]);
+                zone.Pods[3] = int.Parse(inputs[5]);
+            }
+        }
+
+        public static Game Read()
+        {
+            var inputs = Console.ReadLine().Split(' ');
+            var zoneCount = int.Parse(inputs[2]); // the amount of zones on the map
+            var linkCount = int.Parse(inputs[3]); // the amount of links between all zones
+            
+            var zones = Enumerable.Range(0, zoneCount).Select(Zone.Read).ToArray();
+            Zone.ReadLinks(zones, linkCount);
+
+            return new Game
+                   {
+                       PlayersCount = int.Parse(inputs[0]),
+                       MyPlayerId = int.Parse(inputs[1]),
+                       Zones = zones
+                   };
+        }
+    }
+
+    public class Zone
+    {
+        public int Id { get; set; }
+        public int OwnerId { get; set; }
+        public int PlatinumSource { get; set; }
+        public IList<int> AdjacentZoneIds { get; set; }
+        public int[] Pods { get; set; }
+
+        public static Zone Read(int id)
+        {
+            var inputs = Console.ReadLine().Split(' ');
+
+            return new Zone
+                   {
+                       Id = int.Parse(inputs[0]),
+                       OwnerId = -1,
+                       PlatinumSource = int.Parse(inputs[1]),
+                       AdjacentZoneIds = new List<int>(),
+                       Pods = new int[4],
+                   };
+        }
+
+        public static void ReadLinks(Zone[] zones, int linkCount)
+        {
+            for (var i = 0; i < linkCount; i++)
+            {
+                var inputs = Console.ReadLine().Split(' ');
+                var zone1 = int.Parse(inputs[0]);
+                var zone2 = int.Parse(inputs[1]);
+
+                zones[zone1].AdjacentZoneIds.Add(zone2);
+                zones[zone2].AdjacentZoneIds.Add(zone1);
             }
         }
     }
