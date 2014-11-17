@@ -17,12 +17,6 @@ namespace Laconic.Codingame.PlatinumRift
                 game.ReadRound();
                 var output = gameController.CalculateRound();
 
-                Console.Error.WriteLine("ContinentsCount:{0} PlatinumSource:{1}", game.Continents.Length, game.PlatinumSource);
-                foreach (var continent in game.Continents)
-                {
-                    Console.Error.WriteLine("Length:{0} IsNeutral:{1} IsOwned:{2} PlatinumSource:{3}", continent.Zones.Length, continent.IsNeutral, continent.IsOwned, continent.PlatinumSource);
-                }
-
                 Console.WriteLine(MovementsToCommands(output.Movements));
                 Console.WriteLine(PurchasesToCommands(output.Purchases));
             }
@@ -35,7 +29,7 @@ namespace Laconic.Codingame.PlatinumRift
             var sb = new StringBuilder();
             foreach (var m in movements)
             {
-                sb.AppendFormat("{0} {1} {2} ", m.PodsCount, m.OriginZoneId, m.DestinationZoneId);
+                sb.AppendFormat("{0} {1} {2} ", m.PodsCount, m.OriginZone.Id, m.NextZone.Id);
             }
 
             return sb.ToString(0, sb.Length-1);
@@ -48,7 +42,7 @@ namespace Laconic.Codingame.PlatinumRift
             var sb = new StringBuilder();
             foreach (var m in purchases)
             {
-                sb.AppendFormat("{0} {1} ", m.PodsCount, m.ZoneId);
+                sb.AppendFormat("{0} {1} ", m.PodsCount, m.Zone.Id);
             }
 
             return sb.ToString(0, sb.Length - 1);
@@ -57,13 +51,23 @@ namespace Laconic.Codingame.PlatinumRift
 
     public class GameController
     {
-        private static Random _entropy = new Random();
+        //private static readonly Random Entropy = new Random();
+        private const int PodCost = 20;
 
         private readonly Game _game;
+
+        private readonly Color[] _colors;
+        private readonly int[] _parentIds;
+        private readonly Queue<Zone> _queue;
 
         public GameController(Game game)
         {
             _game = game;
+            
+            var zoneCount = _game.Zones.Length;
+            _colors = new Color[zoneCount];
+            _parentIds = new int[zoneCount];
+            _queue = new Queue<Zone>();
         }
 
         public Output CalculateRound()
@@ -82,35 +86,143 @@ namespace Laconic.Codingame.PlatinumRift
         {
             var movements = new List<Movement>();
 
-            foreach (var continent in _game.Continents)
+            foreach (var continent in _game.Continents.Where(x => x.IsOwned == false))
             {
-                foreach (var zone in continent.Zones.Where(x => x.IsMine && x.MyPodsCount > 0))
+                foreach (var zone in continent.Zones.Where(x => x.IsMine && x.MyPodsCount > 0 && x.OpponentPodsCount == 0))
                 {
-                    var notMineZones = zone.AdjacentZones.Where(x => x.IsMine == false).OrderByDescending(x => x.IsNeutral).ToList();
+                    var availablePods = zone.MyPodsCount;
 
-                    for (var i = 0; i < zone.MyPodsCount; i++)
-                    {
-                        var destinationZone = notMineZones.Count > 0 ? notMineZones.First() : zone.AdjacentZones[_entropy.Next(zone.AdjacentZones.Length)];
+                    RunBfs(zone, z => z.AdjacentZones.OrderBy(x => x.IsMine).ThenByDescending(x => x.PlatinumSource).ThenBy(x => x.IsNeutral),
+                        (originZone, discoveredZone) =>
+                        {
+                            if (discoveredZone.IsMine || availablePods <= 0) return;
 
-                        movements.Add(new Movement
-                                      {
-                                          PodsCount = 1,
-                                          OriginZoneId = zone.Id,
-                                          DestinationZoneId = destinationZone.Id,
-                                      });
-                    }
+                            availablePods--;
+                            movements.Add(new Movement
+                                          {
+                                              PodsCount = 1,
+                                              OriginZone = originZone,
+                                              NextZone = GetNextZoneOnRoute(originZone, discoveredZone),
+                                              DestinationZone = discoveredZone,
+                                          });
+                        }, () => availablePods <= 0);
                 }
             }
 
             return movements;
         }
 
+        private void RunBfs(Zone originZone, Func<Zone, IEnumerable<Zone>> adjacentZoneSelector, Action<Zone, Zone> zoneDiscoveredAction, Func<bool> stopCondition)
+        {
+            _queue.Clear();
+            for (var i = 0; i < _game.Zones.Length; i++)
+            {
+                _colors[i] = Color.White;
+                _parentIds[i] = -1;
+            }
+
+            _queue.Enqueue(originZone);
+            _colors[originZone.Id] = Color.Grey;
+            _parentIds[originZone.Id] = originZone.Id;
+
+            while (_queue.Count > 0 && stopCondition() == false)
+            {
+                var currentZone = _queue.Dequeue();
+
+                foreach (var discoveredZone in adjacentZoneSelector(currentZone).Where(x => _colors[x.Id] == Color.White))
+                {
+                    _queue.Enqueue(discoveredZone);
+                    _colors[discoveredZone.Id] = Color.Grey;
+                    _parentIds[discoveredZone.Id] = currentZone.Id;
+
+                    zoneDiscoveredAction(originZone, discoveredZone);
+                }
+
+                _colors[currentZone.Id] = Color.Black;
+            }
+        }
+
+        private Zone GetNextZoneOnRoute(Zone originZone, Zone destinationZone)
+        {
+            var resultId = destinationZone.Id;
+
+            while (_parentIds[resultId] != originZone.Id)
+            {
+                resultId = _parentIds[resultId];
+            }
+
+            return _game.Zones[resultId];
+        }
+
         private IList<Purchase> Buy()
         {
-            return new[]
-                   {
-                       new Purchase {PodsCount = 1, ZoneId = 73}
-                   };
+            var podsCount = _game.MyPlatinum / PodCost;
+            if (podsCount == 0) return new List<Purchase>();
+
+            var continents = _game.Continents.Where(x => x.IsOwned == false && x.Zones.Any(y => y.IsMine || y.IsNeutral)).ToArray();
+
+            return DistributePods(continents, podsCount).SelectMany(x => PlaceOnContinent(x.Key, x.Value)).ToList();
+        }
+
+        private static IEnumerable<KeyValuePair<Continent, int>> DistributePods(Continent[] continents, int podsCount)
+        {
+            CalculateDistribution(continents, podsCount);
+
+            var podsToPlace = continents.ToDictionary(x => x, x => 0);
+            while (podsCount > 0)
+            {
+                var continent = continents.MaxBy(x => x.PodsDistribution);
+                podsToPlace[continent] += 1;
+                continent.PodsDistribution -= 1.0;
+                podsCount--;
+            }
+
+            return podsToPlace;
+        }
+
+        private static void CalculateDistribution(Continent[] conqueringContinents, int podsCount)
+        {
+            foreach (var continent in conqueringContinents)
+            {
+                continent.PodsDistribution += GetContinentDistribution(conqueringContinents, continent, podsCount);
+            }
+        }
+
+        private static double GetContinentDistribution(IEnumerable<Continent> conqueringContinents, Continent continent, int podsCount)
+        {
+            return podsCount*((double) continent.Zones.Length/conqueringContinents.Sum(x => x.Zones.Length));
+        }
+
+        private IEnumerable<Purchase> PlaceOnContinent(Continent continent, int podsCount)
+        {
+            if (podsCount == 0) return Enumerable.Empty<Purchase>();
+
+            var placedPods = new Dictionary<Zone, int>();
+
+            var availablePods = podsCount;
+            foreach (var zone in continent.Zones.Where(x => x.IsMine == false).OrderByDescending(x => x.PlatinumSource))
+            {
+                if (zone.IsNeutral)
+                {
+                    availablePods--;
+                    placedPods.AddOrModify(zone, 1, x => x + 1);
+                }
+                else
+                {
+                    RunBfs(zone, z => z.AdjacentZones.OrderByDescending(x => x.IsNeutral).ThenByDescending(x => x.IsMine),
+                        (originZone, discoveredZone) =>
+                        {
+                            if (discoveredZone.CanSpawn == false || availablePods <= 0) return;
+
+                            availablePods--;
+                            placedPods.AddOrModify(discoveredZone, 1, x => x + 1);
+                        }, () => availablePods <= 0);
+                }
+
+                if (availablePods <= 0) break;
+            }
+
+            return placedPods.Select(x => new Purchase {Zone = x.Key, PodsCount = x.Value});
         }
 
         public class Output
@@ -122,14 +234,15 @@ namespace Laconic.Codingame.PlatinumRift
         public class Movement
         {
             public int PodsCount { get; set; }
-            public int OriginZoneId { get; set; }
-            public int DestinationZoneId { get; set; }
+            public Zone OriginZone { get; set; }
+            public Zone NextZone { get; set; }
+            public Zone DestinationZone { get; set; }
         }
 
         public class Purchase
         {
             public int PodsCount { get; set; }
-            public int ZoneId { get; set; }
+            public Zone Zone { get; set; }
         }
     }
 
@@ -242,9 +355,24 @@ namespace Laconic.Codingame.PlatinumRift
             get { return OwnerId == Game.MyPlayerId; }
         }
 
+        public bool IsOpponents
+        {
+            get { return OwnerId != -1 && OwnerId != Game.MyPlayerId; }
+        }
+
         public int MyPodsCount
         {
             get { return PodsPerPlayerId[Game.MyPlayerId]; }
+        }
+
+        public int OpponentPodsCount
+        {
+            get { return PodsPerPlayerId.Where((x, i) => i != Game.MyPlayerId).Sum(); }
+        }
+
+        public bool CanSpawn
+        {
+            get { return IsMine || IsNeutral; }
         }
 
         public static Zone[] ReadMany(Game game, int zoneCount, int linkCount)
@@ -297,13 +425,19 @@ namespace Laconic.Codingame.PlatinumRift
 
     public class Continent
     {
+        public static int IdCounter = 0;
+
+        public int Id { get; private set; }
         public Zone[] Zones { get; private set; }
         public int PlatinumSource { get; private set; }
+        public double PodsDistribution { get; set; }
 
         public Continent(IEnumerable<Zone> zones)
         {
+            Id = IdCounter++;
             Zones = zones.ToArray();
             PlatinumSource = Zones.Sum(x => x.PlatinumSource);
+            PodsDistribution = 0.0;
         }
 
         public bool IsNeutral
@@ -324,6 +458,21 @@ namespace Laconic.Codingame.PlatinumRift
                 return ownerId != -1;
             }
         }
+
+        public int MyPodsCount
+        {
+            get { return Zones.Sum(x => x.MyPodsCount); }
+        }
+
+        public int OpponentPodsCount
+        {
+            get { return Zones.Sum(x => x.OpponentPodsCount); }
+        }
+
+        public bool CanSpawn
+        {
+            get { return Zones.Any(x => x.IsMine || x.IsNeutral); }
+        }
     }
 
     public enum Color
@@ -332,5 +481,55 @@ namespace Laconic.Codingame.PlatinumRift
         White,
         Grey,
         Black
+    }
+
+    public static class DictionaryExtentions
+    {
+        public static void AddOrModify<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, TValue initialValue, Func<TValue, TValue> modifyValueFunc)
+        {
+            if (dictionary.ContainsKey(key))
+            {
+                dictionary[key] = modifyValueFunc(dictionary[key]);
+            }
+            else
+            {
+                dictionary[key] = initialValue;
+            }
+        }
+    }
+
+    public static class EnumerableExtentions
+    {
+        public static TSource MaxBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> selector)
+        {
+            return source.MaxBy(selector, Comparer<TKey>.Default);
+        }
+
+        public static TSource MaxBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> selector, IComparer<TKey> comparer)
+        {
+            if (source == null) throw new ArgumentNullException("source");
+            if (selector == null) throw new ArgumentNullException("selector");
+            if (comparer == null) throw new ArgumentNullException("comparer");
+            using (var sourceIterator = source.GetEnumerator())
+            {
+                if (!sourceIterator.MoveNext())
+                {
+                    throw new InvalidOperationException("Sequence contains no elements");
+                }
+                var max = sourceIterator.Current;
+                var maxKey = selector(max);
+                while (sourceIterator.MoveNext())
+                {
+                    var candidate = sourceIterator.Current;
+                    var candidateProjected = selector(candidate);
+                    if (comparer.Compare(candidateProjected, maxKey) > 0)
+                    {
+                        max = candidate;
+                        maxKey = candidateProjected;
+                    }
+                }
+                return max;
+            }
+        }
     }
 }
