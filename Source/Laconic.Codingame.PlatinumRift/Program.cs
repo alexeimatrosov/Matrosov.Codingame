@@ -90,58 +90,89 @@ namespace Laconic.Codingame.PlatinumRift
 
             foreach (var continent in _game.Continents.Where(x => x.IsOwned == false))
             {
-                var movesQueue = new Queue<Move>(
-                    continent.Zones
-                        .Where(x => x.IsMine && x.MyPodsCount > 0 && x.OpponentPodsCount == 0)
-                        .SelectMany(x => Enumerable.Range(0, x.MyPodsCount).Select(y => new Move {OriginZone = x, PodsCount = 1})));
-
-                var continentMoves = new List<Move>();
+                var zonesWithPods = continent.Zones.Where(x => x.IsMine && x.MyPodsCount > 0 && x.MaxOpponentPodsCount == 0);
+                var movesUndetermined = zonesWithPods.SelectMany(x => Enumerable.Range(0, x.MyPodsCount).Select(y => new Move {State = MoveState.Undetermined, OriginZone = x, PodsCount = 1}));
+                var movesQueue = new Queue<Move>(movesUndetermined);
+                var movesDetermined = new List<Move>();
 
                 while (movesQueue.Count > 0)
                 {
                     var move = movesQueue.Dequeue();
-                    var originZone = move.OriginZone;
-                    var availablePods = move.PodsCount;
 
-                    BfsInitialize(originZone);
+                    BfsInitialize(move.OriginZone);
 
-                    while (_queue.Count > 0 && availablePods > 0)
+                    while (_queue.Count > 0 && move.State != MoveState.Determined)
                     {
                         var currentZone = _queue.Dequeue();
+                        var adjacentZones = currentZone.AdjacentZones
+                            .Where(x => _colors[x.Id] == Color.White)
+                            .OrderByDescending(x => x.MaxOpponentPodsCount)
+                            .ThenBy(x => x.MaxOpponentPodsCount > 0 ? !x.IsMine : x.IsMine)
+                            .ThenByDescending(x => x.PlatinumSource)
+                            .ThenBy(x => x.IsNeutral)
+                            .ThenBy(x => x.AdjacentZones.Length)
+                            .ThenByDescending(x => x.AdjacentMyZonesCount);
 
-                        foreach (var discoveredZone in currentZone.AdjacentZones.Where(x => _colors[x.Id] == Color.White).OrderBy(x => x.IsMine).ThenByDescending(x => x.PlatinumSource).ThenBy(x => x.IsNeutral))
+                        foreach (var discoveredZone in adjacentZones)
                         {
                             BfsDiscover(currentZone, discoveredZone);
 
-                            if (discoveredZone.IsMine && availablePods > 0) continue;
+                            if (move.State == MoveState.Determined) continue;
+                            if (discoveredZone.IsMine) continue;
 
-                            var moveToCancel = continentMoves.FirstOrDefault(x => x.DestinationZone == discoveredZone && x.Distance > _distances[discoveredZone.Id]);
-                            if (moveToCancel != null)
+                            var movesToSameDestination = movesDetermined.Where(x => x.DestinationZone == discoveredZone).ToArray();
+                            var longerMovesToSameDestination = movesToSameDestination.Where(x => x.Distance > _distances[discoveredZone.Id]).ToArray();
+
+                            if (movesToSameDestination.Length == 0)
                             {
-                                continentMoves.Remove(moveToCancel);
-                                podsQueue.Enqueue(new Tuple<Zone, int>(moveToCancel.OriginZone, moveToCancel.PodsCount));
+                                BfsSetMove(MoveState.Determined, move, discoveredZone);
+                                movesDetermined.Add(move);
                             }
+                            else if (longerMovesToSameDestination.Length > 0)
+                            {
+                                BfsSetMove(MoveState.Determined, move, discoveredZone);
+                                movesDetermined.Add(move);
 
-                            var move = new Move
-                                       {
-                                           PodsCount = 1,
-                                           OriginZone = originZone,
-                                           NextZone = BfsNextZoneOnRoute(originZone, discoveredZone),
-                                           DestinationZone = discoveredZone,
-                                           Distance = _distances[discoveredZone.Id],
-                                       };
-                            continentMoves.Add(move);
-                            availablePods--;
+                                foreach (var cancelMove in longerMovesToSameDestination)
+                                {
+                                    cancelMove.State = MoveState.Undetermined;
+                                    movesDetermined.Remove(cancelMove);
+                                    movesQueue.Enqueue(cancelMove);
+                                }
+                            }
+                            else if (discoveredZone.MaxOpponentPodsCount > 0 && (movesToSameDestination.Length + discoveredZone.MyPodsCount < discoveredZone.MaxOpponentPodsCount))
+                            {
+                                BfsSetMove(MoveState.Determined, move, discoveredZone);
+                                movesDetermined.Add(move);
+                            }
+                            else
+                            {
+                                BfsSetMove(MoveState.Undetermined, move, discoveredZone);
+                            }
                         }
 
                         _colors[currentZone.Id] = Color.Black;
                     }
+
+                    if (move.State == MoveState.Undetermined)
+                    {
+                        move.State = MoveState.Determined;
+                        movesDetermined.Add(move);
+                    }
                 }
 
-                moves.AddRange(continentMoves);
+                moves.AddRange(movesDetermined);
             }
 
             return moves;
+        }
+
+        private void BfsSetMove(MoveState state, Move move, Zone destinationZone)
+        {
+            move.State = state;
+            move.NextZone = BfsNextZoneOnRoute(move.OriginZone, destinationZone);
+            move.DestinationZone = destinationZone;
+            move.Distance = _distances[destinationZone.Id];
         }
 
         private void BfsInitialize(Zone zone)
@@ -185,50 +216,88 @@ namespace Laconic.Codingame.PlatinumRift
             var podsCount = _game.MyPlatinum / PodCost;
             if (podsCount == 0) return new List<Purchase>();
 
-            var continents = _game.Continents.Where(x => x.IsOwned == false && x.Zones.Any(y => y.IsMine || y.IsNeutral)).ToArray();
+            var continents = _game.Continents.Where(x => x.IsOwned == false && x.CanSpawn && (x.OpponentPodsCount > 0 || x.MyPodsCount == 0)).ToArray();
+            SetPodsDistribution(continents, podsCount);
 
-            return DistributePods(continents, podsCount).SelectMany(x => PlaceOnContinent(x.Key, x.Value)).ToList();
+            return continents.SelectMany(PlaceOnContinent).ToList();
         }
 
-        private static IEnumerable<KeyValuePair<Continent, int>> DistributePods(Continent[] continents, int podsCount)
+        private static void SetPodsDistribution(IList<Continent> continents, int podsCount)
         {
-            CalculateDistribution(continents, podsCount);
+            if (continents.Count == 0) return;
 
-            var podsToPlace = continents.ToDictionary(x => x, x => 0);
-            while (podsCount > 0)
+            SetContinentsPodsDistribution(continents);
+            var continentsByDistribution = continents.OrderByDescending(x => x.PodsDistribution).ToList();
+
+            var podsRemainder = podsCount;
+            foreach (var continent in continentsByDistribution)
             {
-                var continent = continents.MaxBy(x => x.PodsDistribution);
-                podsToPlace[continent] += 1;
-                continent.PodsDistribution -= 1.0;
-                podsCount--;
+                var podsToPlace = (int)Math.Floor(continent.PodsDistribution * podsCount);
+                continent.DistributedPodsCount = podsToPlace;
+                podsRemainder -= podsToPlace;
             }
 
-            return podsToPlace;
-        }
+            //Console.Error.WriteLine("podsCount:{0} podsRemainder:{1} continents.Count:{2}", podsCount, podsRemainder, continents.Count);
+            //for (var i = 0; i < continentsByDistribution.Count; i++)
+            //{
+            //    Console.Error.WriteLine("DistributedPodsCount[{0}]: {1}", i, continentsByDistribution[i].DistributedPodsCount);
+            //}
 
-        private static void CalculateDistribution(Continent[] conqueringContinents, int podsCount)
-        {
-            foreach (var continent in conqueringContinents)
+            for (var i = 0; i < podsRemainder; i++)
             {
-                continent.PodsDistribution += GetContinentDistribution(conqueringContinents, continent, podsCount);
+                continentsByDistribution[i].DistributedPodsCount++;
             }
         }
 
-        private static double GetContinentDistribution(IEnumerable<Continent> conqueringContinents, Continent continent, int podsCount)
+        private static void SetContinentsPodsDistribution(IList<Continent> continents)
         {
-            return podsCount*((double) continent.Zones.Length/conqueringContinents.Sum(x => x.Zones.Length));
+            foreach (var continent in continents)
+            {
+                continent.PodsDistribution = GetContinentDistribution(continent);
+            }
+
+            var totalDistribution = continents.Sum(x => x.PodsDistribution);
+            foreach (var continent in continents)
+            {
+                continent.PodsDistribution /= totalDistribution;
+            }
         }
 
-        private IEnumerable<Purchase> PlaceOnContinent(Continent continent, int podsCount)
+        private static double GetContinentDistribution(Continent continent)
         {
-            if (podsCount == 0) return Enumerable.Empty<Purchase>();
+            var weightPlatinumSource = continent.PlatinumSource > 0 ? 1.0 - (double)continent.MyPlatinumSource / continent.PlatinumSource : 0.0;
+            var weightZonesCount = 1.0 - (double)continent.MyZonesCount / continent.Zones.Length;
+            var weightPodsCount = continent.MyPodsCount > 0 ? (double)continent.OpponentPodsCount / continent.MyPodsCount : 1.0;
+
+            //Console.Error.WriteLine("ContinentId:{0} WPS:{1} WZC:{2} WPC:{3}", continent.Id, weightPlatinumSource, weightZonesCount, weightPodsCount);
+
+            return weightPodsCount*(weightPlatinumSource*continent.PlatinumSource + weightZonesCount*continent.Zones.Length);
+        }
+
+        private IEnumerable<Purchase> PlaceOnContinent(Continent continent)
+        {
+            if (continent.DistributedPodsCount == 0) return Enumerable.Empty<Purchase>();
 
             var placedPods = new Dictionary<Zone, int>();
+            var availablePods = continent.DistributedPodsCount;
 
-            var availablePods = podsCount;
-            foreach (var zone in continent.Zones.Where(x => x.IsMine == false).OrderByDescending(x => x.PlatinumSource))
+            var candidateZones = continent.Zones
+                .Where(x => x.IsMine == false || x.MaxOpponentPodsCount > x.MyPodsCount)
+                .OrderByDescending(x => x.PlatinumSource)
+                .ThenByDescending(x => x.LocalPlatinumSource)
+                .ThenByDescending(x => x.IsMine);
+
+            foreach (var zone in candidateZones)
             {
-                if (zone.IsNeutral)
+                if (zone.IsMine)
+                {
+                    for (var i = 0; i < zone.MaxOpponentPodsCount - zone.MyPodsCount && availablePods > 0; i++)
+                    {
+                        availablePods--;
+                        placedPods.AddOrModify(zone, 1, x => x + 1);
+                    }
+                }
+                else if (zone.IsNeutral)
                 {
                     availablePods--;
                     placedPods.AddOrModify(zone, 1, x => x + 1);
@@ -240,8 +309,9 @@ namespace Laconic.Codingame.PlatinumRift
                     while (_queue.Count > 0 && availablePods > 0)
                     {
                         var currentZone = _queue.Dequeue();
+                        var adjacentZones = currentZone.AdjacentZones.Where(x => _colors[x.Id] == Color.White).OrderByDescending(x => x.IsNeutral).ThenByDescending(x => x.IsMine);
 
-                        foreach (var discoveredZone in currentZone.AdjacentZones.Where(x => _colors[x.Id] == Color.White).OrderByDescending(x => x.IsNeutral).ThenByDescending(x => x.IsMine))
+                        foreach (var discoveredZone in adjacentZones)
                         {
                             BfsDiscover(currentZone, discoveredZone);
 
@@ -269,6 +339,7 @@ namespace Laconic.Codingame.PlatinumRift
 
         public class Move
         {
+            public MoveState State { get; set; }
             public int PodsCount { get; set; }
             public Zone OriginZone { get; set; }
             public Zone NextZone { get; set; }
@@ -281,6 +352,14 @@ namespace Laconic.Codingame.PlatinumRift
             public int PodsCount { get; set; }
             public Zone Zone { get; set; }
         }
+
+        public enum MoveState 
+        {
+            None,
+            Undetermined,
+            Tentative,
+            Determined,
+        }
     }
 
     public class Game
@@ -291,44 +370,23 @@ namespace Laconic.Codingame.PlatinumRift
         public int PlatinumSource { get; private set; }
         public Zone[] Zones { get; private set; }
         public Continent[] Continents { get; private set; }
-
-        public void ReadRound()
-        {
-            MyPlatinum = int.Parse(Console.ReadLine());
-
-            for (var i = 0; i < Zones.Length; i++)
-            {
-                var inputs = Console.ReadLine().Split(' ');
-                var id = int.Parse(inputs[0]);
-
-                var zone = Zones[id];
-                zone.OwnerId = int.Parse(inputs[1]);
-                zone.PodsPerPlayerId[0] = int.Parse(inputs[2]);
-                zone.PodsPerPlayerId[1] = int.Parse(inputs[3]);
-                zone.PodsPerPlayerId[2] = int.Parse(inputs[4]);
-                zone.PodsPerPlayerId[3] = int.Parse(inputs[5]);
-            }
-        }
-
+        
         public static Game Read()
         {
             var inputs = Console.ReadLine().Split(' ');
 
-            var game = new Game
-                       {
-                           PlayersCount = int.Parse(inputs[0]),
-                           MyPlayerId = int.Parse(inputs[1]),
-                           MyPlatinum = 0
-                       };
-
-            var zones = Zone.ReadMany(game, int.Parse(inputs[2]), int.Parse(inputs[3]));
+            var zones = Zone.ReadMany(int.Parse(inputs[2]), int.Parse(inputs[3]));
             var continents = ZonesToContinents(zones);
 
-            game.PlatinumSource = continents.Sum(x => x.PlatinumSource);
-            game.Zones = zones;
-            game.Continents = continents;
-
-            return game;
+            return new Game
+                   {
+                       PlayersCount = int.Parse(inputs[0]),
+                       MyPlayerId = int.Parse(inputs[1]),
+                       MyPlatinum = 0,
+                       PlatinumSource = continents.Sum(x => x.PlatinumSource),
+                       Zones = zones,
+                       Continents = continents
+                   };
         }
 
         private static Continent[] ZonesToContinents(ICollection<Zone> zones)
@@ -369,6 +427,57 @@ namespace Laconic.Codingame.PlatinumRift
 
             colors[zone.Id] = Color.Black;
         }
+
+        public void ReadRound()
+        {
+            MyPlatinum = int.Parse(Console.ReadLine());
+
+            for (var i = 0; i < Zones.Length; i++)
+            {
+                var inputs = Console.ReadLine().Split(' ');
+                var id = int.Parse(inputs[0]);
+
+                var zone = Zones[id];
+                zone.OwnerId = int.Parse(inputs[1]);
+                zone.PodsPerPlayerId[0] = int.Parse(inputs[2]);
+                zone.PodsPerPlayerId[1] = int.Parse(inputs[3]);
+                zone.PodsPerPlayerId[2] = int.Parse(inputs[4]);
+                zone.PodsPerPlayerId[3] = int.Parse(inputs[5]);
+            }
+
+            foreach (var z in Zones)
+            {
+                z.IsNeutral = z.OwnerId == -1;
+                z.IsMine = z.OwnerId == MyPlayerId;
+                z.IsOpponents = z.OwnerId != -1 && z.OwnerId != MyPlayerId;
+                z.CanSpawn = z.IsMine || z.IsNeutral;
+                z.MyPodsCount = z.PodsPerPlayerId[MyPlayerId];
+                z.OpponentPodsCount = z.PodsPerPlayerId.Where((x, i) => i != MyPlayerId).Sum();
+                z.MaxOpponentPodsCount = z.PodsPerPlayerId.Where((x, i) => i != MyPlayerId).Max();
+                z.AdjacentMyZonesCount = z.AdjacentZones.Count(x => x.OwnerId == MyPlayerId);
+            }
+
+            foreach (var c in Continents)
+            {
+                c.IsOwned = IsContinentOwned(c);
+                c.CanSpawn = c.Zones.Any(z => z.CanSpawn);
+                c.MyPodsCount = c.Zones.Sum(x => x.MyPodsCount);
+                c.OpponentPodsCount = c.Zones.Sum(x => x.OpponentPodsCount);
+                c.MyPlatinumSource = c.Zones.Where(x => x.IsMine).Sum(x => x.PlatinumSource);
+                c.MyZonesCount = c.Zones.Count(x => x.IsMine);
+            }
+        }
+
+        private static bool IsContinentOwned(Continent continent)
+        {
+            var ownerId = continent.Zones[0].OwnerId;
+            for (var i = 1; i < continent.Zones.Length; i++)
+            {
+                if (ownerId != continent.Zones[i].OwnerId) return false;
+            }
+
+            return ownerId != -1;
+        }
     }
 
     public class Zone
@@ -377,56 +486,35 @@ namespace Laconic.Codingame.PlatinumRift
 
         public int Id { get; private set; }
         public int PlatinumSource { get; private set; }
-        public int[] PodsPerPlayerId { get; private set; }
+        public int LocalPlatinumSource { get; private set; }
         public Zone[] AdjacentZones { get; private set; }
 
         public int OwnerId { get; set; }
+        public int[] PodsPerPlayerId { get; private set; }
 
-        public bool IsNeutral
-        {
-            get { return OwnerId == -1; }
-        }
+        public bool IsNeutral { get; set; }
+        public bool IsMine { get; set; }
+        public bool IsOpponents { get; set; }
+        public bool CanSpawn { get; set; }
+        public int MyPodsCount { get; set; }
+        public int OpponentPodsCount { get; set; }
+        public int MaxOpponentPodsCount { get; set; }
+        public int AdjacentMyZonesCount { get; set; }
 
-        public bool IsMine
+        public static Zone[] ReadMany(int zoneCount, int linkCount)
         {
-            get { return OwnerId == Game.MyPlayerId; }
-        }
-
-        public bool IsOpponents
-        {
-            get { return OwnerId != -1 && OwnerId != Game.MyPlayerId; }
-        }
-
-        public int MyPodsCount
-        {
-            get { return PodsPerPlayerId[Game.MyPlayerId]; }
-        }
-
-        public int OpponentPodsCount
-        {
-            get { return PodsPerPlayerId.Where((x, i) => i != Game.MyPlayerId).Sum(); }
-        }
-
-        public bool CanSpawn
-        {
-            get { return IsMine || IsNeutral; }
-        }
-
-        public static Zone[] ReadMany(Game game, int zoneCount, int linkCount)
-        {
-            var zones = Enumerable.Range(0, zoneCount).Select(x => ReadOne(game, x)).ToArray();
+            var zones = Enumerable.Range(0, zoneCount).Select(x => ReadOne()).ToArray();
             ReadLinks(zones, linkCount);
 
             return zones;
         }
 
-        private static Zone ReadOne(Game game, int id)
+        private static Zone ReadOne()
         {
             var inputs = Console.ReadLine().Split(' ');
 
             return new Zone
                    {
-                       Game = game,
                        OwnerId = -1,
                        Id = int.Parse(inputs[0]),
                        PlatinumSource = int.Parse(inputs[1]),
@@ -457,6 +545,11 @@ namespace Laconic.Codingame.PlatinumRift
             {
                 zone.AdjacentZones = zones.Join(adjacentZoneIds[zone.Id], x => x.Id, y => y, (x, y) => x).ToArray();
             }
+
+            foreach (var zone in zones)
+            {
+                zone.LocalPlatinumSource = zone.PlatinumSource + zone.AdjacentZones.Sum(x => x.PlatinumSource);
+            }
         }
     }
 
@@ -467,48 +560,22 @@ namespace Laconic.Codingame.PlatinumRift
         public int Id { get; private set; }
         public Zone[] Zones { get; private set; }
         public int PlatinumSource { get; private set; }
+
         public double PodsDistribution { get; set; }
+        public int DistributedPodsCount { get; set; }
+
+        public bool IsOwned { get; set; }
+        public bool CanSpawn { get; set; }
+        public int MyPodsCount { get; set; }
+        public int OpponentPodsCount { get; set; }
+        public int MyPlatinumSource { get; set; }
+        public int MyZonesCount { get; set; }
 
         public Continent(IEnumerable<Zone> zones)
         {
             Id = IdCounter++;
             Zones = zones.ToArray();
             PlatinumSource = Zones.Sum(x => x.PlatinumSource);
-            PodsDistribution = 0.0;
-        }
-
-        public bool IsNeutral
-        {
-            get { return Zones.All(x => x.IsNeutral); }
-        }
-
-        public bool IsOwned
-        {
-            get
-            {
-                var ownerId = Zones[0].OwnerId;
-                for (var i = 1; i < Zones.Length; i++)
-                {
-                    if (ownerId != Zones[i].OwnerId) return false;
-                }
-                
-                return ownerId != -1;
-            }
-        }
-
-        public int MyPodsCount
-        {
-            get { return Zones.Sum(x => x.MyPodsCount); }
-        }
-
-        public int OpponentPodsCount
-        {
-            get { return Zones.Sum(x => x.OpponentPodsCount); }
-        }
-
-        public bool CanSpawn
-        {
-            get { return Zones.Any(x => x.IsMine || x.IsNeutral); }
         }
     }
 
