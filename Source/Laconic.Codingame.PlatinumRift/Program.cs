@@ -15,14 +15,14 @@ namespace Laconic.Codingame.PlatinumRift
             while (true)
             {
                 game.ReadRound();
-                var output = gameController.CalculateRound();
+                var output = gameController.PlayRound();
 
                 Console.WriteLine(MovementsToCommands(output.Movements));
                 Console.WriteLine(PurchasesToCommands(output.Purchases));
             }
         }
 
-        private static string MovementsToCommands(ICollection<GameController.Movement> movements)
+        private static string MovementsToCommands(ICollection<GameController.Move> movements)
         {
             if (movements.Count == 0) return "WAIT";
 
@@ -58,6 +58,7 @@ namespace Laconic.Codingame.PlatinumRift
 
         private readonly Color[] _colors;
         private readonly int[] _parentIds;
+        private readonly int[] _distances;
         private readonly Queue<Zone> _queue;
 
         public GameController(Game game)
@@ -67,12 +68,13 @@ namespace Laconic.Codingame.PlatinumRift
             var zoneCount = _game.Zones.Length;
             _colors = new Color[zoneCount];
             _parentIds = new int[zoneCount];
+            _distances = new int[zoneCount];
             _queue = new Queue<Zone>();
         }
 
-        public Output CalculateRound()
+        public Output PlayRound()
         {
-            var movements = Move();
+            var movements = Go();
             var purchases = Buy();
 
             return new Output
@@ -82,67 +84,91 @@ namespace Laconic.Codingame.PlatinumRift
                    };
         }
 
-        private IList<Movement> Move()
+        private IList<Move> Go()
         {
-            var movements = new List<Movement>();
+            var moves = new List<Move>();
 
             foreach (var continent in _game.Continents.Where(x => x.IsOwned == false))
             {
-                foreach (var zone in continent.Zones.Where(x => x.IsMine && x.MyPodsCount > 0 && x.OpponentPodsCount == 0))
+                var movesQueue = new Queue<Move>(
+                    continent.Zones
+                        .Where(x => x.IsMine && x.MyPodsCount > 0 && x.OpponentPodsCount == 0)
+                        .SelectMany(x => Enumerable.Range(0, x.MyPodsCount).Select(y => new Move {OriginZone = x, PodsCount = 1})));
+
+                var continentMoves = new List<Move>();
+
+                while (movesQueue.Count > 0)
                 {
-                    var availablePods = zone.MyPodsCount;
+                    var move = movesQueue.Dequeue();
+                    var originZone = move.OriginZone;
+                    var availablePods = move.PodsCount;
 
-                    RunBfs(zone, z => z.AdjacentZones.OrderBy(x => x.IsMine).ThenByDescending(x => x.PlatinumSource).ThenBy(x => x.IsNeutral),
-                        (originZone, discoveredZone) =>
+                    BfsInitialize(originZone);
+
+                    while (_queue.Count > 0 && availablePods > 0)
+                    {
+                        var currentZone = _queue.Dequeue();
+
+                        foreach (var discoveredZone in currentZone.AdjacentZones.Where(x => _colors[x.Id] == Color.White).OrderBy(x => x.IsMine).ThenByDescending(x => x.PlatinumSource).ThenBy(x => x.IsNeutral))
                         {
-                            if (discoveredZone.IsMine || availablePods <= 0) return;
+                            BfsDiscover(currentZone, discoveredZone);
 
+                            if (discoveredZone.IsMine && availablePods > 0) continue;
+
+                            var moveToCancel = continentMoves.FirstOrDefault(x => x.DestinationZone == discoveredZone && x.Distance > _distances[discoveredZone.Id]);
+                            if (moveToCancel != null)
+                            {
+                                continentMoves.Remove(moveToCancel);
+                                podsQueue.Enqueue(new Tuple<Zone, int>(moveToCancel.OriginZone, moveToCancel.PodsCount));
+                            }
+
+                            var move = new Move
+                                       {
+                                           PodsCount = 1,
+                                           OriginZone = originZone,
+                                           NextZone = BfsNextZoneOnRoute(originZone, discoveredZone),
+                                           DestinationZone = discoveredZone,
+                                           Distance = _distances[discoveredZone.Id],
+                                       };
+                            continentMoves.Add(move);
                             availablePods--;
-                            movements.Add(new Movement
-                                          {
-                                              PodsCount = 1,
-                                              OriginZone = originZone,
-                                              NextZone = GetNextZoneOnRoute(originZone, discoveredZone),
-                                              DestinationZone = discoveredZone,
-                                          });
-                        }, () => availablePods <= 0);
+                        }
+
+                        _colors[currentZone.Id] = Color.Black;
+                    }
                 }
+
+                moves.AddRange(continentMoves);
             }
 
-            return movements;
+            return moves;
         }
 
-        private void RunBfs(Zone originZone, Func<Zone, IEnumerable<Zone>> adjacentZoneSelector, Action<Zone, Zone> zoneDiscoveredAction, Func<bool> stopCondition)
+        private void BfsInitialize(Zone zone)
         {
             _queue.Clear();
             for (var i = 0; i < _game.Zones.Length; i++)
             {
                 _colors[i] = Color.White;
+                _distances[i] = -1;
                 _parentIds[i] = -1;
             }
 
-            _queue.Enqueue(originZone);
-            _colors[originZone.Id] = Color.Grey;
-            _parentIds[originZone.Id] = originZone.Id;
-
-            while (_queue.Count > 0 && stopCondition() == false)
-            {
-                var currentZone = _queue.Dequeue();
-
-                foreach (var discoveredZone in adjacentZoneSelector(currentZone).Where(x => _colors[x.Id] == Color.White))
-                {
-                    _queue.Enqueue(discoveredZone);
-                    _colors[discoveredZone.Id] = Color.Grey;
-                    _parentIds[discoveredZone.Id] = currentZone.Id;
-
-                    zoneDiscoveredAction(originZone, discoveredZone);
-                }
-
-                _colors[currentZone.Id] = Color.Black;
-            }
+            _queue.Enqueue(zone);
+            _colors[zone.Id] = Color.Grey;
+            _distances[zone.Id] = 0;
+            _parentIds[zone.Id] = zone.Id;
         }
 
-        private Zone GetNextZoneOnRoute(Zone originZone, Zone destinationZone)
+        private void BfsDiscover(Zone currentZone, Zone discoveredZone)
+        {
+            _queue.Enqueue(discoveredZone);
+            _colors[discoveredZone.Id] = Color.Grey;
+            _distances[discoveredZone.Id] = _distances[currentZone.Id] + 1;
+            _parentIds[discoveredZone.Id] = currentZone.Id;
+        }
+
+        private Zone BfsNextZoneOnRoute(Zone originZone, Zone destinationZone)
         {
             var resultId = destinationZone.Id;
 
@@ -209,14 +235,24 @@ namespace Laconic.Codingame.PlatinumRift
                 }
                 else
                 {
-                    RunBfs(zone, z => z.AdjacentZones.OrderByDescending(x => x.IsNeutral).ThenByDescending(x => x.IsMine),
-                        (originZone, discoveredZone) =>
+                    BfsInitialize(zone);
+
+                    while (_queue.Count > 0 && availablePods > 0)
+                    {
+                        var currentZone = _queue.Dequeue();
+
+                        foreach (var discoveredZone in currentZone.AdjacentZones.Where(x => _colors[x.Id] == Color.White).OrderByDescending(x => x.IsNeutral).ThenByDescending(x => x.IsMine))
                         {
-                            if (discoveredZone.CanSpawn == false || availablePods <= 0) return;
+                            BfsDiscover(currentZone, discoveredZone);
+
+                            if (discoveredZone.CanSpawn == false || availablePods <= 0) continue;
 
                             availablePods--;
                             placedPods.AddOrModify(discoveredZone, 1, x => x + 1);
-                        }, () => availablePods <= 0);
+                        }
+
+                        _colors[currentZone.Id] = Color.Black;
+                    }
                 }
 
                 if (availablePods <= 0) break;
@@ -227,16 +263,17 @@ namespace Laconic.Codingame.PlatinumRift
 
         public class Output
         {
-            public IList<Movement> Movements { get; set; }
+            public IList<Move> Movements { get; set; }
             public IList<Purchase> Purchases { get; set; }
         }
 
-        public class Movement
+        public class Move
         {
             public int PodsCount { get; set; }
             public Zone OriginZone { get; set; }
             public Zone NextZone { get; set; }
             public Zone DestinationZone { get; set; }
+            public int Distance { get; set; }
         }
 
         public class Purchase
@@ -303,13 +340,13 @@ namespace Laconic.Codingame.PlatinumRift
             }
 
             var continents = new List<Continent>();
-            var continentZones = new List<Zone>();
 
+            var continentZones = new List<Zone>();
             foreach (var zone in zones)
             {
                 if (colors[zone.Id] != Color.White) continue;
 
-                VisitZone(continentZones, colors, zone);
+                VisitZone(zone, continentZones, colors);
                 continents.Add(new Continent(continentZones));
                 continentZones.Clear();
             }
@@ -317,7 +354,7 @@ namespace Laconic.Codingame.PlatinumRift
             return continents.ToArray();
         }
 
-        private static void VisitZone(ICollection<Zone> continentZones, IList<Color> colors, Zone zone)
+        private static void VisitZone(Zone zone, ICollection<Zone> continentZones, IList<Color> colors)
         {
             colors[zone.Id] = Color.Grey;
 
@@ -327,7 +364,7 @@ namespace Laconic.Codingame.PlatinumRift
             {
                 if (colors[adjacentZone.Id] != Color.White) continue;
 
-                VisitZone(continentZones, colors, adjacentZone);
+                VisitZone(adjacentZone, continentZones, colors);
             }
 
             colors[zone.Id] = Color.Black;
