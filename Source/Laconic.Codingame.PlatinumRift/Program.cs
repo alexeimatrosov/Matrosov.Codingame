@@ -106,10 +106,11 @@ namespace Laconic.Codingame.PlatinumRift
                         var currentZone = _queue.Dequeue();
                         var adjacentZones = currentZone.AdjacentZones
                             .Where(x => _colors[x.Id] == Color.White)
-                            .OrderByDescending(x => x.MaxOpponentPodsCount)
-                            .ThenBy(x => x.MaxOpponentPodsCount > 0 ? !x.IsMine : x.IsMine)
-                            .ThenByDescending(x => x.PlatinumSource)
-                            .ThenBy(x => x.IsNeutral)
+                            .OrderByDescending(x => x.PlatinumSource)
+                            .ThenByDescending(x => x.LocalPlatinumSource)
+                            .ThenByDescending(x => x.IsNeutral)
+                            .ThenByDescending(x => x.IsMine && x.MaxOpponentPodsCount > 0)
+                            .ThenBy(x => x.MaxOpponentPodsCount)
                             .ThenBy(x => x.AdjacentZones.Length)
                             .ThenByDescending(x => x.AdjacentMyZonesCount);
 
@@ -118,7 +119,7 @@ namespace Laconic.Codingame.PlatinumRift
                             BfsDiscover(currentZone, discoveredZone);
 
                             if (move.State == MoveState.Determined) continue;
-                            if (discoveredZone.IsMine) continue;
+                            if (discoveredZone.IsMine && discoveredZone.MaxOpponentPodsCount == 0) continue;
 
                             var movesToSameDestination = movesDetermined.Where(x => x.DestinationZone == discoveredZone).ToArray();
                             var longerMovesToSameDestination = movesToSameDestination.Where(x => x.Distance > _distances[discoveredZone.Id]).ToArray();
@@ -219,7 +220,12 @@ namespace Laconic.Codingame.PlatinumRift
             var continents = _game.Continents.Where(x => x.IsOwned == false && x.CanSpawn && (x.OpponentPodsCount > 0 || x.MyPodsCount == 0)).ToArray();
             SetPodsDistribution(continents, podsCount);
 
-            return continents.SelectMany(PlaceOnContinent).ToList();
+            foreach (var continent in continents)
+            {
+                PlaceOnContinent(continent);
+            }
+
+            return continents.SelectMany(x => x.Zones).Where(x => x.PodsToPurchase > 0).Select(x => new Purchase {Zone = x, PodsCount = x.PodsToPurchase}).ToList();
         }
 
         private static void SetPodsDistribution(IList<Continent> continents, int podsCount)
@@ -274,11 +280,10 @@ namespace Laconic.Codingame.PlatinumRift
             return weightPodsCount*(weightPlatinumSource*continent.PlatinumSource + weightZonesCount*continent.Zones.Length);
         }
 
-        private IEnumerable<Purchase> PlaceOnContinent(Continent continent)
+        private void PlaceOnContinent(Continent continent)
         {
-            if (continent.DistributedPodsCount == 0) return Enumerable.Empty<Purchase>();
+            if (continent.DistributedPodsCount == 0) return;
 
-            var placedPods = new Dictionary<Zone, int>();
             var availablePods = continent.DistributedPodsCount;
 
             var candidateZones = continent.Zones
@@ -294,13 +299,13 @@ namespace Laconic.Codingame.PlatinumRift
                     for (var i = 0; i < zone.MaxOpponentPodsCount - zone.MyPodsCount && availablePods > 0; i++)
                     {
                         availablePods--;
-                        placedPods.AddOrModify(zone, 1, x => x + 1);
+                        zone.PodsToPurchase++;
                     }
                 }
                 else if (zone.IsNeutral)
                 {
                     availablePods--;
-                    placedPods.AddOrModify(zone, 1, x => x + 1);
+                    zone.PodsToPurchase++;
                 }
                 else
                 {
@@ -309,7 +314,10 @@ namespace Laconic.Codingame.PlatinumRift
                     while (_queue.Count > 0 && availablePods > 0)
                     {
                         var currentZone = _queue.Dequeue();
-                        var adjacentZones = currentZone.AdjacentZones.Where(x => _colors[x.Id] == Color.White).OrderByDescending(x => x.IsNeutral).ThenByDescending(x => x.IsMine);
+                        var adjacentZones = currentZone.AdjacentZones
+                            .Where(x => _colors[x.Id] == Color.White)
+                            .OrderByDescending(x => x.IsNeutral)
+                            .ThenByDescending(x => x.IsMine);
 
                         foreach (var discoveredZone in adjacentZones)
                         {
@@ -318,7 +326,7 @@ namespace Laconic.Codingame.PlatinumRift
                             if (discoveredZone.CanSpawn == false || availablePods <= 0) continue;
 
                             availablePods--;
-                            placedPods.AddOrModify(discoveredZone, 1, x => x + 1);
+                            discoveredZone.PodsToPurchase++;
                         }
 
                         _colors[currentZone.Id] = Color.Black;
@@ -327,8 +335,6 @@ namespace Laconic.Codingame.PlatinumRift
 
                 if (availablePods <= 0) break;
             }
-
-            return placedPods.Select(x => new Purchase {Zone = x.Key, PodsCount = x.Value});
         }
 
         public class Output
@@ -455,6 +461,8 @@ namespace Laconic.Codingame.PlatinumRift
                 z.OpponentPodsCount = z.PodsPerPlayerId.Where((x, i) => i != MyPlayerId).Sum();
                 z.MaxOpponentPodsCount = z.PodsPerPlayerId.Where((x, i) => i != MyPlayerId).Max();
                 z.AdjacentMyZonesCount = z.AdjacentZones.Count(x => x.OwnerId == MyPlayerId);
+
+                z.PodsToPurchase = 0;
             }
 
             foreach (var c in Continents)
@@ -465,6 +473,9 @@ namespace Laconic.Codingame.PlatinumRift
                 c.OpponentPodsCount = c.Zones.Sum(x => x.OpponentPodsCount);
                 c.MyPlatinumSource = c.Zones.Where(x => x.IsMine).Sum(x => x.PlatinumSource);
                 c.MyZonesCount = c.Zones.Count(x => x.IsMine);
+
+                c.PodsDistribution = 0.0;
+                c.DistributedPodsCount = 0;
             }
         }
 
@@ -500,6 +511,8 @@ namespace Laconic.Codingame.PlatinumRift
         public int OpponentPodsCount { get; set; }
         public int MaxOpponentPodsCount { get; set; }
         public int AdjacentMyZonesCount { get; set; }
+
+        public int PodsToPurchase { get; set; }
 
         public static Zone[] ReadMany(int zoneCount, int linkCount)
         {
