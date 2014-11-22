@@ -65,8 +65,6 @@ namespace Laconic.Codingame.PlatinumRift
 
         public Output PlayRound()
         {
-            //_bfs.Stopwatch.Restart();
-
             var movements = Go();
             var purchases = Buy();
 
@@ -84,16 +82,16 @@ namespace Laconic.Codingame.PlatinumRift
 
         private IEnumerable<Move> GoOnContinent(Continent continent)
         {
-            var zonesWithPods = continent.Zones.Where(x => x.IsMine && x.MyPodsCount > 0 && x.MaxOpponentPodsCount == 0);
-            var movesUndetermined = zonesWithPods.SelectMany(x => Enumerable.Range(0, x.MyPodsCount).Select(y => new Move {State = MoveState.Undetermined, OriginZone = x, PodsCount = 1}));
+            var movesUndetermined = GetUndeterminedMoves(continent);
             var movesQueue = new Queue<Move>(movesUndetermined);
             var movesDetermined = new List<Move>();
 
             while (movesQueue.Count > 0)
             {
                 var move = movesQueue.Dequeue();
+                var originZone = move.OriginZone;
 
-                foreach (var pair in _bfs.GetDistantZones(move.OriginZone).Skip(1))
+                foreach (var pair in _bfs.GetDistantZones(originZone).Skip(1))
                 {
                     if (move.State == MoveState.Determined) break;
 
@@ -104,9 +102,10 @@ namespace Laconic.Codingame.PlatinumRift
 
                     var prioritizedZones = distantZones
                         .OrderByDescending(x => x.PlatinumSource)
+                        .ThenByDescending(x => x.LocalPlatinumSourceDensity)
                         .ThenByDescending(x => x.LocalPlatinumSource)
+                        .ThenByDescending(x => x.IsMine)
                         .ThenByDescending(x => x.IsNeutral)
-                        .ThenByDescending(x => x.IsMine && x.MaxOpponentPodsCount > 0)
                         .ThenBy(x => x.MaxOpponentPodsCount)
                         .ThenBy(x => x.AdjacentZones.Length)
                         .ThenByDescending(x => x.AdjacentMyZonesCount);
@@ -115,6 +114,7 @@ namespace Laconic.Codingame.PlatinumRift
                     {
                         if (move.State == MoveState.Determined) continue;
                         if (zone.IsMine && zone.MaxOpponentPodsCount == 0) continue;
+                        if (zone.IsMine && (zone.AdjacentNotMineMaxPlatinumSource > zone.PlatinumSource || zone.MaxOpponentPodsCount + zone.AdjacentMaxOpponentPodsCount < zone.MyPodsCount)) continue;
 
                         var movesToSameDestination = movesDetermined.Where(x => x.DestinationZone == zone).ToArray();
                         var longerMovesToSameDestination = movesToSameDestination.Where(x => x.Distance > distance).ToArray();
@@ -136,7 +136,12 @@ namespace Laconic.Codingame.PlatinumRift
                                 movesQueue.Enqueue(cancelMove);
                             }
                         }
-                        else if (zone.MaxOpponentPodsCount > 0 && (movesToSameDestination.Length + zone.MyPodsCount < zone.MaxOpponentPodsCount))
+                        else if (zone.MaxOpponentPodsCount > 0 && zone.MaxOpponentPodsCount > movesToSameDestination.Length + zone.MyPodsCount)
+                        {
+                            SetMove(MoveState.Determined, move, zone, distance);
+                            movesDetermined.Add(move);
+                        }
+                        else if (zone.AdjacentNotMineMaxPlatinumSource <= zone.PlatinumSource && (zone.MaxOpponentPodsCount + zone.AdjacentMaxOpponentPodsCount > movesToSameDestination.Length + zone.MyPodsCount))
                         {
                             SetMove(MoveState.Determined, move, zone, distance);
                             movesDetermined.Add(move);
@@ -156,6 +161,27 @@ namespace Laconic.Codingame.PlatinumRift
             }
 
             return movesDetermined;
+        }
+
+        private static IEnumerable<Move> GetUndeterminedMoves(Continent continent)
+        {
+            var zonesWithPods = continent.Zones.Where(x => x.IsMine && x.MyPodsCount > 0);
+
+            var movesUndetermined = new List<Move>();
+            foreach (var zone in zonesWithPods)
+            {
+                var podsToMove = zone.MyPodsCount;
+                if (zone.AdjacentNotMineMaxPlatinumSource <= zone.PlatinumSource && (zone.MaxOpponentPodsCount + zone.AdjacentMaxOpponentPodsCount >= zone.MyPodsCount))
+                {
+                    podsToMove = Math.Max(0, zone.MyPodsCount - zone.MaxOpponentPodsCount - zone.AdjacentMaxOpponentPodsCount);
+                }
+
+                var moves = Enumerable.Range(0, podsToMove).Select(y => new Move {State = MoveState.Undetermined, OriginZone = zone, PodsCount = 1});
+
+                movesUndetermined.AddRange(moves);
+            }
+
+            return movesUndetermined;
         }
 
         private void SetMove(MoveState state, Move move, Zone destinationZone, int distance)
@@ -227,11 +253,12 @@ namespace Laconic.Codingame.PlatinumRift
         {
             var weightPlatinumSource = continent.PlatinumSource > 0 ? 1.0 - (double)continent.MyPlatinumSource / continent.PlatinumSource : 0.0;
             var weightZonesCount = 1.0 - (double)continent.MyZonesCount / continent.Zones.Length;
-            var weightPodsCount = continent.MyPodsCount > 0 ? (double)continent.OpponentPodsCount / continent.MyPodsCount : 1.0;
+            //var weightPodsCount = continent.MyPodsCount > 0 ? (double)continent.OpponentPodsCount / continent.MyPodsCount : 1.0;
 
             //Console.Error.WriteLine("ContinentId:{0} WPS:{1} WZC:{2} WPC:{3}", continent.Id, weightPlatinumSource, weightZonesCount, weightPodsCount);
 
-            return weightPodsCount*(weightPlatinumSource*continent.PlatinumSource + weightZonesCount*continent.Zones.Length);
+            //return weightPodsCount*(weightPlatinumSource*continent.PlatinumSource + weightZonesCount*continent.Zones.Length);
+            return weightPlatinumSource*continent.PlatinumSource + weightZonesCount*continent.Zones.Length;
         }
 
         private void PlaceOnContinent(Continent continent)
@@ -241,45 +268,44 @@ namespace Laconic.Codingame.PlatinumRift
             var availablePods = continent.DistributedPodsCount;
 
             var candidateZones = continent.Zones
-                .Where(x => x.IsMine == false || x.MaxOpponentPodsCount > x.MyPodsCount)
                 .OrderByDescending(x => x.PlatinumSource)
                 .ThenByDescending(x => x.LocalPlatinumSource)
+                .ThenByDescending(x => x.IsNeutral)
                 .ThenByDescending(x => x.IsMine);
 
             foreach (var zone in candidateZones)
             {
-                if (availablePods <= 0) break;
+                if (availablePods <= 0) return;
 
-                if (zone.IsMine)
+                if (zone.IsNeutral)
                 {
-                    for (var i = 0; i < zone.MaxOpponentPodsCount - zone.MyPodsCount && availablePods > 0; i++)
+                    for (var i = 0; i < Math.Max(1, zone.AdjacentMaxOpponentPodsCount) && availablePods > 0; i++)
                     {
                         availablePods--;
                         zone.PodsToPurchase++;
                     }
                 }
-                else if (zone.IsNeutral)
+                else if (zone.IsMine && zone.AdjacentNotMineMaxPlatinumSource <= zone.PlatinumSource && (zone.MaxOpponentPodsCount + zone.AdjacentMaxOpponentPodsCount > zone.MyPodsCount))
                 {
-                    availablePods--;
-                    zone.PodsToPurchase++;
+                    for (var i = 0; i < zone.MaxOpponentPodsCount + zone.AdjacentMaxOpponentPodsCount - zone.MyPodsCount && availablePods > 0; i++)
+                    {
+                        availablePods--;
+                        zone.PodsToPurchase++;
+                    }
                 }
-                else
+                else if (zone.IsMine == false)
                 {
                     foreach (var pair in _bfs.GetDistantZones(zone).Skip(1))
                     {
                         if (availablePods <= 0) break;
 
-                        var prioritizedZones = pair.Value
-                            .OrderByDescending(x => x.IsNeutral)
-                            .ThenByDescending(x => x.IsMine);
+                        var zones = pair.Value.OrderByDescending(x => x.PlatinumSource).Where(x => x.CanSpawn).ToArray();
+                        if (zones.Length == 0) continue;
 
-                        foreach (var discoveredZone in prioritizedZones)
+                        for (var i = 0; availablePods > 0; i = (i+1)%zones.Length)
                         {
-                            if (availablePods <= 0) break;
-                            if (discoveredZone.CanSpawn == false) continue;
-
                             availablePods--;
-                            discoveredZone.PodsToPurchase++;
+                            zones[i].PodsToPurchase++;
                         }
                     }
                 }
@@ -526,6 +552,11 @@ namespace Laconic.Codingame.PlatinumRift
                 z.OpponentPodsCount = z.PodsPerPlayerId.Where((x, i) => i != MyPlayerId).Sum();
                 z.MaxOpponentPodsCount = z.PodsPerPlayerId.Where((x, i) => i != MyPlayerId).Max();
                 z.AdjacentMyZonesCount = z.AdjacentZones.Count(x => x.OwnerId == MyPlayerId);
+                z.AdjacentMaxPlatinumSource = z.AdjacentZones.Max(x => x.PlatinumSource);
+                var adjacentZonesNotMine = z.AdjacentZones.Where(x => x.IsMine == false).ToList();
+                z.AdjacentNotMineMaxPlatinumSource = adjacentZonesNotMine.Count > 0 ? adjacentZonesNotMine.Max(x => x.PlatinumSource) : 0;
+                z.AdjacentOpponentPodsCount = z.AdjacentZones.Sum(x => x.OpponentPodsCount);
+                z.AdjacentMaxOpponentPodsCount = z.AdjacentZones.Max(x => x.MaxOpponentPodsCount);
 
                 z.PodsToPurchase = 0;
             }
@@ -563,6 +594,7 @@ namespace Laconic.Codingame.PlatinumRift
         public int Id { get; private set; }
         public int PlatinumSource { get; private set; }
         public int LocalPlatinumSource { get; private set; }
+        public double LocalPlatinumSourceDensity { get; private set; }
         public Zone[] AdjacentZones { get; private set; }
 
         public int OwnerId { get; set; }
@@ -576,6 +608,10 @@ namespace Laconic.Codingame.PlatinumRift
         public int OpponentPodsCount { get; set; }
         public int MaxOpponentPodsCount { get; set; }
         public int AdjacentMyZonesCount { get; set; }
+        public int AdjacentMaxPlatinumSource { get; set; }
+        public int AdjacentNotMineMaxPlatinumSource { get; set; }
+        public int AdjacentOpponentPodsCount { get; set; }
+        public int AdjacentMaxOpponentPodsCount { get; set; }
 
         public int PodsToPurchase { get; set; }
 
@@ -627,6 +663,7 @@ namespace Laconic.Codingame.PlatinumRift
             foreach (var zone in zones)
             {
                 zone.LocalPlatinumSource = zone.PlatinumSource + zone.AdjacentZones.Sum(x => x.PlatinumSource);
+                zone.LocalPlatinumSourceDensity = (double) zone.LocalPlatinumSource/(zone.AdjacentZones.Length + 1);
             }
         }
     }
