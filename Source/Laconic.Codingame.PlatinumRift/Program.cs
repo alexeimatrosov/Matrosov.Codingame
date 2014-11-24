@@ -251,13 +251,13 @@ namespace Laconic.Codingame.PlatinumRift
         {
             var weightPlatinumSource = continent.PlatinumSource > 0 ? 1.0 - (double)continent.MyPlatinumSource / continent.PlatinumSource : 0.0;
             var weightZonesCount = 1.0 - (double)continent.MyZonesCount / continent.Zones.Length;
-            var weightPodsCount = continent.MyPodsCount > 0 ? (double)continent.OpponentPodsCount / continent.MyPodsCount : 1.0;
+            //var weightPodsCount = continent.MyPodsCount > 0 ? (double)continent.OpponentPodsCount / continent.MyPodsCount : 1.0;
             //var weightPlatinumSourceDensity = (double) continent.PlatinumSource/continent.Zones.Length;
 
             //Console.Error.WriteLine("ContinentId:{0} WPS:{1} WZC:{2} WPC:{3}", continent.Id, weightPlatinumSource, weightZonesCount, weightPodsCount);
 
-            //return weightPlatinumSource*continent.PlatinumSource + weightZonesCount*continent.Zones.Length;
-            return weightPodsCount*(weightPlatinumSource*continent.PlatinumSource + weightZonesCount*continent.Zones.Length);
+            return weightPlatinumSource*continent.PlatinumSource + weightZonesCount*continent.Zones.Length;
+            //return weightPodsCount*(weightPlatinumSource*continent.PlatinumSource + weightZonesCount*continent.Zones.Length);
             //return weightPlatinumSourceDensity * (weightPlatinumSource * continent.PlatinumSource + weightZonesCount * continent.Zones.Length);
         }
 
