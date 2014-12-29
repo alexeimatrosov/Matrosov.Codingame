@@ -1,13 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Laconic.Codingame.BenderTheMoneyMachine", "Laconic.Codingame.BenderTheMoneyMachine\Laconic.Codingame.BenderTheMoneyMachine.csproj", "{87B807EA-B771-4F00-8AED-A5592C07ECDB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{E18BE2D2-697A-4ADF-801C-F824BA60773D}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Laconic.Codingame.BenderTheMoneyMachine.Tests", "Laconic.Codingame.BenderTheMoneyMachine.Tests\Laconic.Codingame.BenderTheMoneyMachine.Tests.csproj", "{93BC695E-0BF2-4A60-B19C-CA78BC8E04FB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Laconic.Codingame.GameOfDrones", "Laconic.Codingame.GameOfDrones\Laconic.Codingame.GameOfDrones.csproj", "{1C099A69-5BED-44D4-B0E7-C0AC15FEBB6E}"
 EndProject
@@ -22,6 +20,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{B30832
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Laconic.Codingame.NetworkCabling", "Laconic.Codingame.NetworkCabling\Laconic.Codingame.NetworkCabling.csproj", "{E98FCD78-3B93-47C6-8734-1FBCCCF3AA48}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Laconic.Codingame.Tests", "Laconic.Codingame.Tests\Laconic.Codingame.Tests.csproj", "{0F54B9F5-2CA1-49DF-90C1-DD2FB8602DE7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,10 +34,6 @@ Global
 		{87B807EA-B771-4F00-8AED-A5592C07ECDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{87B807EA-B771-4F00-8AED-A5592C07ECDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{87B807EA-B771-4F00-8AED-A5592C07ECDB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{93BC695E-0BF2-4A60-B19C-CA78BC8E04FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{93BC695E-0BF2-4A60-B19C-CA78BC8E04FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{93BC695E-0BF2-4A60-B19C-CA78BC8E04FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{93BC695E-0BF2-4A60-B19C-CA78BC8E04FB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1C099A69-5BED-44D4-B0E7-C0AC15FEBB6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1C099A69-5BED-44D4-B0E7-C0AC15FEBB6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1C099A69-5BED-44D4-B0E7-C0AC15FEBB6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -48,11 +46,19 @@ Global
 		{47777B91-8EE7-4771-A4D6-9500351B3857}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{47777B91-8EE7-4771-A4D6-9500351B3857}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{47777B91-8EE7-4771-A4D6-9500351B3857}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E98FCD78-3B93-47C6-8734-1FBCCCF3AA48}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E98FCD78-3B93-47C6-8734-1FBCCCF3AA48}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E98FCD78-3B93-47C6-8734-1FBCCCF3AA48}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E98FCD78-3B93-47C6-8734-1FBCCCF3AA48}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0F54B9F5-2CA1-49DF-90C1-DD2FB8602DE7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F54B9F5-2CA1-49DF-90C1-DD2FB8602DE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F54B9F5-2CA1-49DF-90C1-DD2FB8602DE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F54B9F5-2CA1-49DF-90C1-DD2FB8602DE7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{93BC695E-0BF2-4A60-B19C-CA78BC8E04FB} = {E18BE2D2-697A-4ADF-801C-F824BA60773D}
+		{0F54B9F5-2CA1-49DF-90C1-DD2FB8602DE7} = {E18BE2D2-697A-4ADF-801C-F824BA60773D}
 	EndGlobalSection
 EndGlobal

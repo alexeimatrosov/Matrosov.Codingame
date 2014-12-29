@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Laconic.Codingame.BenderTheMoneyMachine.Tests")]
+[assembly: AssemblyTitle("Laconic.Codingame.NetworkCabling")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Laconic.Codingame.BenderTheMoneyMachine.Tests")]
+[assembly: AssemblyProduct("Laconic.Codingame.NetworkCabling")]
 [assembly: AssemblyCopyright("Copyright ©  2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("6eedc595-ea13-484c-a83b-b0119b36ea08")]
+[assembly: Guid("078a0103-3716-43ae-ab7f-417aa447b5c3")]
 
 // Version information for an assembly consists of the following four values:
 //
