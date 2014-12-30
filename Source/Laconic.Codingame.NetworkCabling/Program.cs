@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace Laconic.Codingame.NetworkCabling
 {
@@ -8,17 +9,27 @@ namespace Laconic.Codingame.NetworkCabling
         {
             var points = ReadInput();
 
-            long lengthY = 0;
-            var minX = points[0].X;
-            var maxX = points[0].X;
-            for (var i = 1; i < points.Length; i++)
+            var minX = long.MaxValue;
+            var maxX = long.MinValue;
+            long sumY = 0;
+            foreach (var p in points)
             {
-                minX = points[i].X < minX ? points[i].X : minX;
-                maxX = points[i].X > maxX ? points[i].X : maxX;
-                //lengthY += Math.Abs(points[i].Y - points[i-1].Y);
+                minX = p.X < minX ? p.X : minX;
+                maxX = p.X > maxX ? p.X : maxX;
+                sumY += p.Y;
             }
 
-            Console.WriteLine(maxX - minX + lengthY);
+            var averageY = sumY/points.Length;
+            var meanPoint = points[0];
+            foreach (var p in points)
+            {
+                meanPoint = Math.Abs(p.Y - averageY) < Math.Abs(meanPoint.Y - averageY) ? p : meanPoint;
+            }
+
+            var lengthX = maxX - minX;
+            var lengthY = points.Sum(x => Math.Abs(x.Y - meanPoint.Y));
+
+            Console.WriteLine(lengthX + lengthY);
         }
 
         private static Point[] ReadInput()
