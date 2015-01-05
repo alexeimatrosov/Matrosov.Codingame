@@ -32,6 +32,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Laconic.Codingame.MayanCalc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Laconic.Codingame.Scrabble", "Laconic.Codingame.Scrabble\Laconic.Codingame.Scrabble.csproj", "{9A8F9744-C5DF-4111-BD3B-FDF1EEB39A97}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Laconic.Codingame.SkynetFinaleLevel2", "Laconic.Codingame.SkynetFinaleLevel2\Laconic.Codingame.SkynetFinaleLevel2.csproj", "{036F661A-F409-4D24-ADC7-161E3244D698}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -78,6 +80,10 @@ Global
 		{9A8F9744-C5DF-4111-BD3B-FDF1EEB39A97}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9A8F9744-C5DF-4111-BD3B-FDF1EEB39A97}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9A8F9744-C5DF-4111-BD3B-FDF1EEB39A97}.Release|Any CPU.Build.0 = Release|Any CPU
+		{036F661A-F409-4D24-ADC7-161E3244D698}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{036F661A-F409-4D24-ADC7-161E3244D698}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{036F661A-F409-4D24-ADC7-161E3244D698}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{036F661A-F409-4D24-ADC7-161E3244D698}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
