@@ -6,80 +6,136 @@ namespace Laconic.Codingame.SkynetFinaleLevel2
 {
     public class Program
     {
-        static int _numberOfNodes;
-        static int _numberOfLinks;
-        static int _numberOfExits;
-
-        static int[] _exits;
-        static int[][] _matrix;
-
-        static Color[] _colors;
-        static int[] _distances;
-        static int[] _parents;
-        static readonly Queue<int> Queue = new Queue<int>();
-
         public static void Main(String[] args)
         {
-            ReadInput();
+            var graph = Graph.ReadInput();
 
             while (true)
             {
-                var agentNodeIndex = int.Parse(Console.ReadLine());
+                var agentNode = int.Parse(Console.ReadLine());
+                var link = graph.GetLinkToSevere(agentNode);
 
-                var minDistance = int.MaxValue;
-                var minDistanceFromNodeIndex = 0;
-                var minDistanceToNodeIndex = 0;
-                var minDistanceToMaxNeighborExitsCount = int.MaxValue;
-                var maxNeighborExitsCount = int.MinValue;
-                var maxNeighborExitsCountFromNodeIndex = 0;
-                var maxNeighborExitsCountToNodeIndex = 0;
-                foreach (var exitNodeIndex in _exits)
+                Console.WriteLine("{0} {1}", link.Item1, link.Item2);
+            }
+        }
+    }
+
+    public class Graph
+    {
+        private int[] Exits { get; set; }
+
+        readonly int[][] _matrix;
+        readonly Color[] _colors;
+        readonly int[] _distances;
+        readonly int[] _parents;
+        readonly int[] _pathTransitNodesCount;
+        readonly Queue<int> _queue = new Queue<int>();
+
+        private Graph(int nodesCount)
+        {
+            _matrix = new int[nodesCount][];
+            for (var i = 0; i < nodesCount; i++)
+            {
+                _matrix[i] = new int[nodesCount];
+            }
+
+            _colors = new Color[nodesCount];
+            _distances = new int[nodesCount];
+            _parents = new int[nodesCount];
+            _pathTransitNodesCount = new int[nodesCount];
+        }
+
+        public Tuple<int, int> GetLinkToSevere(int agentNode)
+        {
+            int fromNode;
+            int toNode;
+
+            RunBfs(agentNode);
+
+            var reachableExits = Exits.Where(x => _distances[x] != -1).ToArray();
+            var closestExitNode = reachableExits.OrderBy(x => _distances[x]).First();
+            if (_distances[closestExitNode] == 1)
+            {
+                fromNode = _parents[closestExitNode];
+                toNode = closestExitNode;
+            }
+            else
+            {
+                RunBfs(GetNextNodeIndexOnRoute(agentNode, closestExitNode));
+
+                var exitNodeAtRisk = reachableExits
+                    .OrderByDescending(x => GetNeighborExitsCount(_parents[x]))
+                    .ThenBy(x => _pathTransitNodesCount[x])
+                    .ThenBy(x => _distances[x])
+                    .First();
+
+                fromNode = _parents[exitNodeAtRisk];
+                toNode = exitNodeAtRisk;
+            }
+
+            RemoveLink(fromNode, toNode);
+
+            return new Tuple<int, int>(fromNode, toNode);
+        }
+
+        private void RunBfs(int node)
+        {
+            ResetBfs();
+
+            _colors[node] = Color.Grey;
+            _distances[node] = 0;
+            _parents[node] = 0;
+            _pathTransitNodesCount[node] = GetNeighborExitsCount(node) > 0 ? 0 : 1;
+
+            _queue.Enqueue(node);
+
+            while (_queue.Count > 0)
+            {
+                var currentNode = _queue.Dequeue();
+
+                for (var i = 0; i < _colors.Length; i++)
                 {
-                    RunBfs(exitNodeIndex);
+                    if (_matrix[currentNode][i] != 1 || _colors[i] != Color.White) continue;
 
-                    var distance = _distances[agentNodeIndex];
-                    if (distance == -1) continue;
-
-                    var nextNodeIndex = GetNextNodeIndexOnRoute(exitNodeIndex, agentNodeIndex);
-                    var neighborExitsCount = GetNeighborExitsCount(nextNodeIndex);
-
-                    if (distance < minDistance)
-                    {
-                        minDistance = distance;
-                        minDistanceFromNodeIndex = nextNodeIndex;
-                        minDistanceToNodeIndex = exitNodeIndex;
-                    }
-
-                    if (maxNeighborExitsCount < neighborExitsCount || (maxNeighborExitsCount == neighborExitsCount && distance < minDistanceToMaxNeighborExitsCount))
-                    {
-                        minDistanceToMaxNeighborExitsCount = distance;
-                        maxNeighborExitsCount = neighborExitsCount;
-                        maxNeighborExitsCountFromNodeIndex = nextNodeIndex;
-                        maxNeighborExitsCountToNodeIndex = exitNodeIndex;
-                    }
+                    _colors[i] = Color.Grey;
+                    _distances[i] = _distances[currentNode] + 1;
+                    _parents[i] = currentNode;
+                    _pathTransitNodesCount[i] = _pathTransitNodesCount[currentNode] + (GetNeighborExitsCount(i) > 0 ? 0 : 1);
+                    _queue.Enqueue(i);
                 }
 
-                int fromNodeIndex;
-                int toNodeIndex;
-                if (minDistance > 1)
-                {
-                    fromNodeIndex = maxNeighborExitsCountFromNodeIndex;
-                    toNodeIndex = maxNeighborExitsCountToNodeIndex;
-                }
-                else
-                {
-                    fromNodeIndex = minDistanceFromNodeIndex;
-                    toNodeIndex = minDistanceToNodeIndex;
-                }
-
-                _matrix[fromNodeIndex][toNodeIndex] = 0;
-                _matrix[toNodeIndex][fromNodeIndex] = 0;
-
-                Console.WriteLine("{0} {1}", fromNodeIndex, toNodeIndex);
+                _colors[currentNode] = Color.Black;
             }
         }
 
-        private static int GetNextNodeIndexOnRoute(int fromNodeIndex, int toNodeIndex)
+        private void ResetBfs()
+        {
+            _queue.Clear();
+
+            for (var i = 0; i < _colors.Length; i++)
+            {
+                _colors[i] = Color.White;
+                _distances[i] = -1;
+                _parents[i] = -1;
+                _pathTransitNodesCount[i] = -1;
+            }
+        }
+
+        private int GetNeighborExitsCount(int fromNodeIndex)
+        {
+            var result = 0;
+            for (var i = 0; i < _matrix[fromNodeIndex].Length; i++)
+            {
+                if (_matrix[fromNodeIndex][i] != 0 && Exits.Contains(i))
+                {
+                    result++;
+                }
+            }
+
+            return result;
+        }
+
+        private int GetNextNodeIndexOnRoute(int fromNodeIndex, int toNodeIndex)
         {
             var nextNodeIndex = toNodeIndex;
             while (_parents[nextNodeIndex] != fromNodeIndex)
@@ -90,90 +146,40 @@ namespace Laconic.Codingame.SkynetFinaleLevel2
             return nextNodeIndex;
         }
 
-        private static int GetNeighborExitsCount(int fromNodeIndex)
-        {
-            var result = 0;
-            for (var i = 0; i < _matrix[fromNodeIndex].Length; i++)
-            {
-                if (_matrix[fromNodeIndex][i] != 0 && _exits.Contains(i))
-                {
-                    result++;
-                }
-            }
-
-            return result;
-        }
-
-        private static void RunBfs(int node)
-        {
-            ResetBfs();
-
-            _colors[node] = Color.Grey;
-            _distances[node] = 0;
-            _parents[node] = 0;
-
-            Queue.Enqueue(node);
-
-            while (Queue.Count > 0)
-            {
-                var currentNode = Queue.Dequeue();
-
-                for (var i = 0; i < _numberOfNodes; i++)
-                {
-                    if (_matrix[currentNode][i] != 1 || _colors[i] != Color.White) continue;
-
-                    _colors[i] = Color.Grey;
-                    _distances[i] = _distances[currentNode] + 1;
-                    _parents[i] = currentNode;
-                    Queue.Enqueue(i);
-                }
-
-                _colors[currentNode] = Color.Black;
-            }
-        }
-
-        private static void ResetBfs()
-        {
-            Queue.Clear();
-
-            for (int i = 0; i < _colors.Length; i++)
-            {
-                _colors[i] = Color.White;
-                _distances[i] = -1;
-                _parents[i] = -1;
-            }
-        }
-
-        private static void ReadInput()
+        public static Graph ReadInput()
         {
             var inputs = Console.ReadLine().Split(' ');
-            _numberOfNodes = int.Parse(inputs[0]); // the total number of nodes in the level, including the gateways
-            _numberOfLinks = int.Parse(inputs[1]); // the number of links
-            _numberOfExits = int.Parse(inputs[2]); // the number of exit gateways
+            var nodesCount = int.Parse(inputs[0]); // the total number of nodes in the level, including the gateways
+            var linksCount = int.Parse(inputs[1]); // the number of links
+            var exitsCount = int.Parse(inputs[2]); // the number of exit gateways
 
-            _colors = new Color[_numberOfNodes];
-            _distances = new int[_numberOfNodes];
-            _parents = new int[_numberOfNodes];
-            _matrix = new int[_numberOfNodes][];
-            for (var i = 0; i < _numberOfNodes; i++)
-            {
-                _matrix[i] = new int[_numberOfNodes];
-            }
-
-            for (var i = 0; i < _numberOfLinks; i++)
+            var graph = new Graph(nodesCount);
+            for (var i = 0; i < linksCount; i++)
             {
                 inputs = Console.ReadLine().Split(' ');
-                var N1 = int.Parse(inputs[0]); // N1 and N2 defines a link between these nodes
-                var N2 = int.Parse(inputs[1]);
-                _matrix[N1][N2] = 1;
-                _matrix[N2][N1] = 1;
+                graph.AddLink(int.Parse(inputs[0]), int.Parse(inputs[1]));
             }
 
-            _exits = new int[_numberOfExits];
-            for (var i = 0; i < _numberOfExits; i++)
+            var exits = new int[exitsCount];
+            for (var i = 0; i < exitsCount; i++)
             {
-                _exits[i] = int.Parse(Console.ReadLine());
+                exits[i] = int.Parse(Console.ReadLine());
             }
+            graph.Exits = exits;
+
+            return graph;
+        }
+
+        private void AddLink(int fromNode, int toNode)
+        {
+            _matrix[fromNode][toNode] = 1;
+            _matrix[toNode][fromNode] = 1;
+        }
+
+        private void RemoveLink(int fromNode, int toNode)
+        {
+            _matrix[fromNode][toNode] = 0;
+            _matrix[toNode][fromNode] = 0;
         }
 
         enum Color
