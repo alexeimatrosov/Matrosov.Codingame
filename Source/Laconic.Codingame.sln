@@ -34,6 +34,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Laconic.Codingame.Scrabble"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Laconic.Codingame.SkynetFinaleLevel2", "Laconic.Codingame.SkynetFinaleLevel2\Laconic.Codingame.SkynetFinaleLevel2.csproj", "{036F661A-F409-4D24-ADC7-161E3244D698}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Laconic.Codingame.KirksQuestTheLabyrinth", "Laconic.Codingame.KirksQuestTheLabyrinth\Laconic.Codingame.KirksQuestTheLabyrinth.csproj", "{C739E757-5B59-40AF-AA1A-551308D9D4C0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -84,6 +86,10 @@ Global
 		{036F661A-F409-4D24-ADC7-161E3244D698}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{036F661A-F409-4D24-ADC7-161E3244D698}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{036F661A-F409-4D24-ADC7-161E3244D698}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C739E757-5B59-40AF-AA1A-551308D9D4C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C739E757-5B59-40AF-AA1A-551308D9D4C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C739E757-5B59-40AF-AA1A-551308D9D4C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C739E757-5B59-40AF-AA1A-551308D9D4C0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
