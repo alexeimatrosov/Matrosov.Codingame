@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.15
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Laconic.Codingame.BenderTheMoneyMachine", "Laconic.Codingame.BenderTheMoneyMachine\Laconic.Codingame.BenderTheMoneyMachine.csproj", "{87B807EA-B771-4F00-8AED-A5592C07ECDB}"
 EndProject
@@ -12,13 +12,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Laconic.Codingame.DontPanicLevel2", "Laconic.Codingame.DontPanicLevel2\Laconic.Codingame.DontPanicLevel2.csproj", "{C414FF0C-7A49-4DD4-810B-8C83C89F9B2B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Laconic.Codingame.PlatinumRift", "Laconic.Codingame.PlatinumRift\Laconic.Codingame.PlatinumRift.csproj", "{47777B91-8EE7-4771-A4D6-9500351B3857}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{B3083277-D1D5-40AA-A9EE-D9C615B3CE2D}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\NuGet.Config = .nuget\NuGet.Config
-		.nuget\NuGet.exe = .nuget\NuGet.exe
-		.nuget\NuGet.targets = .nuget\NuGet.targets
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Laconic.Codingame.NetworkCabling", "Laconic.Codingame.NetworkCabling\Laconic.Codingame.NetworkCabling.csproj", "{E98FCD78-3B93-47C6-8734-1FBCCCF3AA48}"
 EndProject
@@ -96,5 +89,8 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{0F54B9F5-2CA1-49DF-90C1-DD2FB8602DE7} = {E18BE2D2-697A-4ADF-801C-F824BA60773D}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A0F98FCA-C282-42F2-A9EC-10D24C33D513}
 	EndGlobalSection
 EndGlobal

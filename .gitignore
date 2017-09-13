@@ -1,5 +1,4 @@
-Source/*/bin/*
-Source/*/obj/*
-Source/packages/*
-*.user
-*.suo
+Source/*/bin/**
+Source/*/obj/**
+Source/.vs/**
+Source/packages/**
