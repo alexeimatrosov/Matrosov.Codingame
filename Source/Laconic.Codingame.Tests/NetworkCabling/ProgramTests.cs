@@ -8,32 +8,31 @@ namespace Laconic.Codingame.Tests.NetworkCabling
     [TestFixture]
     public class ProgramTests
     {
-        private class TestData
-        {
-            public readonly object[] Files =
-            {
-                new[] {"NetworkCabling/in1.txt", "NetworkCabling/out1.txt"},
-                new[] {"NetworkCabling/in2.txt", "NetworkCabling/out2.txt"},
-                new[] {"NetworkCabling/in3.txt", "NetworkCabling/out3.txt"},
-                new[] {"NetworkCabling/in4.txt", "NetworkCabling/out4.txt"},
-                new[] {"NetworkCabling/in5.txt", "NetworkCabling/out5.txt"},
-                new[] {"NetworkCabling/in6.txt", "NetworkCabling/out6.txt"},
-                new[] {"NetworkCabling/in7.txt", "NetworkCabling/out7.txt"},
-                new[] {"NetworkCabling/in8.txt", "NetworkCabling/out8.txt"},
-                new[] {"NetworkCabling/in9.txt", "NetworkCabling/out9.txt"},
-            };
-        }
+        private static readonly string TestCasesDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "NetworkCabling");
 
-        [TestCaseSource(typeof(TestData), "Files")]
+        private static readonly object[] TestCases =
+        {
+            new[] {"in1.txt", "out1.txt"},
+            new[] {"in2.txt", "out2.txt"},
+            new[] {"in3.txt", "out3.txt"},
+            new[] {"in4.txt", "out4.txt"},
+            new[] {"in5.txt", "out5.txt"},
+            new[] {"in6.txt", "out6.txt"},
+            new[] {"in7.txt", "out7.txt"},
+            new[] {"in8.txt", "out8.txt"},
+            new[] {"in9.txt", "out9.txt"},
+        };
+
+        [TestCaseSource(nameof(TestCases))]
         public void Main_In_Out(string inFile, string outFile)
         {
             var sw = new StringWriter();
-            Console.SetIn(File.OpenText(inFile));
+            Console.SetIn(File.OpenText(Path.Combine(TestCasesDirectory, inFile)));
             Console.SetOut(sw);
 
             Codingame.NetworkCabling.Program.Main();
 
-            Assert.That(long.Parse(sw.ToString()), Is.EqualTo(long.Parse(File.ReadLines(outFile).First())));
+            Assert.That(long.Parse(sw.ToString()), Is.EqualTo(long.Parse(File.ReadLines(Path.Combine(TestCasesDirectory, outFile)).First())));
         }
     }
 }
