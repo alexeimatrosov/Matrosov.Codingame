@@ -58,6 +58,7 @@
     <Compile Include="Temperatures.fs" />
     <Compile Include="PowerOfThor.fs" />
     <Content Include="packages.config" />
+    <Compile Include="ThereIsNoSpoonEpisode1.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Core">
