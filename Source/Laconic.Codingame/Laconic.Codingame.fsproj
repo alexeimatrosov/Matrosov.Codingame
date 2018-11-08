@@ -57,8 +57,9 @@
     <Compile Include="SkynetTheChasm.fs" />
     <Compile Include="Temperatures.fs" />
     <Compile Include="PowerOfThor.fs" />
-    <Content Include="packages.config" />
     <Compile Include="ThereIsNoSpoonEpisode1.fs" />
+    <Compile Include="AneoSponsoredPuzzle.fs" />
+    <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Core">
