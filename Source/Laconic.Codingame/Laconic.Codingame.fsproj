@@ -52,13 +52,14 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="AsciiArt.fs" />
+    <Compile Include="AneoSponsoredPuzzle.fs" />
     <Compile Include="ChuckNorris.fs" />
     <Compile Include="HorseRacingDuels.fs" />
+    <Compile Include="PowerOfThor.fs" />
     <Compile Include="SkynetTheChasm.fs" />
     <Compile Include="Temperatures.fs" />
-    <Compile Include="PowerOfThor.fs" />
     <Compile Include="ThereIsNoSpoonEpisode1.fs" />
-    <Compile Include="AneoSponsoredPuzzle.fs" />
+    <Compile Include="War.fs" />
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

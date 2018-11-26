@@ -6,7 +6,7 @@ open FSharp.Data.UnitSystems.SI.UnitSymbols
 [<Measure>] type kph
 
 type TrafficLight = {
-    Distance : float<m>;
+    Distance : float<m>
     Duration : float<s>
 }
 
@@ -27,9 +27,7 @@ let readTrafficLight() =
 let speedLimit = readInt()
 let lightCount = readInt()
 
-let trafficLights = 
-    seq { for _ in 1 .. lightCount do yield readTrafficLight() }
-    |> Seq.toArray
+let trafficLights = Array.init lightCount (fun _ -> readTrafficLight())
 
 let isGreen (speed:float<kph>) trafficLight =
     let time = getTime trafficLight.Distance speed
