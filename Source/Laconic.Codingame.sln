@@ -33,6 +33,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Laconic.Codingame", "Laconi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Laconic.Codingame.MarsLanderEpisode2", "Laconic.Codingame.MarsLanderEpisode2\Laconic.Codingame.MarsLanderEpisode2.csproj", "{BDE6CE22-3A5E-4490-B863-CFD39F2DA5B1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Laconic.Codingame.TeadsSponsoredContest", "Laconic.Codingame.TeadsSponsoredContest\Laconic.Codingame.TeadsSponsoredContest.csproj", "{A895B566-E3EE-4F0F-BB0C-405D9851F5D3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -95,6 +97,10 @@ Global
 		{BDE6CE22-3A5E-4490-B863-CFD39F2DA5B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BDE6CE22-3A5E-4490-B863-CFD39F2DA5B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BDE6CE22-3A5E-4490-B863-CFD39F2DA5B1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A895B566-E3EE-4F0F-BB0C-405D9851F5D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A895B566-E3EE-4F0F-BB0C-405D9851F5D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A895B566-E3EE-4F0F-BB0C-405D9851F5D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A895B566-E3EE-4F0F-BB0C-405D9851F5D3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
