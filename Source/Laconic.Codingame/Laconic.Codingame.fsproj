@@ -58,6 +58,7 @@
     <Compile Include="PowerOfThor.fs" />
     <Compile Include="SkynetTheChasm.fs" />
     <Compile Include="Temperatures.fs" />
+    <Compile Include="TeadsSponsoredContest.fs" />
     <Compile Include="ThereIsNoSpoonEpisode1.fs" />
     <Compile Include="War.fs" />
     <Content Include="packages.config" />
