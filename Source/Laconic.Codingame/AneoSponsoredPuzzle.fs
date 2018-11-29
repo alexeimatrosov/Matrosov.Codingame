@@ -40,9 +40,7 @@ let checkSpeed (speed:float<kph>) =
     |> Seq.forall (fun x -> isGreen speed x)
 
 let speed =
-    seq { for s in speedLimit .. -1 .. 1 do yield (s, checkSpeed ((float s) * 1.0<kph>)) }
-    |> Seq.filter (fun x -> snd x = true)
+    seq { for s in speedLimit .. -1 .. 1 do if checkSpeed ((float s) * 1.0<kph>) then yield s }
     |> Seq.head
-    |> fst
 
 printfn "%d" speed

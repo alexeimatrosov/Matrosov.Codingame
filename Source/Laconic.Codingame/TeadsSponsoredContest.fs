@@ -31,10 +31,7 @@ let rec visit node depth =
     }
     |> Seq.max
 
-let (KeyValue(leaf,_)) =
-    graph
-    |> Map.filter (fun _ v -> v.Count = 1)
-    |> Seq.head    
+let leaf = graph |> Map.pick (fun k v -> if v.Count = 1 then Some k else None)
 
 let maxDepth = visit leaf 0
 
