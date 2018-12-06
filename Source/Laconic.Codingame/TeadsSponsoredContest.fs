@@ -1,4 +1,4 @@
-﻿module Laconic.Codigame.TeadsSponsoredContest
+﻿module Laconic.Codingame.TeadsSponsoredContest
 
 open System
 
