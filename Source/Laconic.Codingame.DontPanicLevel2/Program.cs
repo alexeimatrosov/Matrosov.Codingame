@@ -9,154 +9,100 @@ namespace Laconic.Codingame.DontPanicLevel2
     {
         public static void Main()
         {
-            var game = Game.Read();
+            var game = new Game();
             Console.Error.WriteLine(game.ToString());
 
-            var i = 0;
-            var actionsQueue = new Queue<Action>();
-            while (true)
-            {
-                var inputs = Tools.ReadStrings();
-                var cloneFloor = int.Parse(inputs[0]); // floor of the leading clone
-                var clonePosition = int.Parse(inputs[1]); // position of the leading clone on its floor
-                //var cloneDirection = inputs[2] == "RIGHT" ? Direction.Right : Direction.Left; // direction of the leading clone: LEFT or RIGHT
+            var actions = game.FindPathActions();
+            Console.WriteLine(string.Join("\n", actions.Select(x => x.ToGameAction())));
 
-                if (i == 0)
-                {
-                    game.SetGenerator(cloneFloor, clonePosition);
-
-                    foreach (var a in game.FindPathActions())
-                    {
-                        actionsQueue.Enqueue(a);
-                    }
-                }
-
-                var action = actionsQueue.Count > 0 ? actionsQueue.Dequeue() : Action.Wait;
-
-                Console.WriteLine(action.ToGameAction());
-                i++;
-            }
+            while (true) Console.WriteLine("WAIT");
         }
     }
 
     public class Game
     {
-        private Point _generator;
-        private Point _exit;
-        private Point[,] _field;
+        private static readonly Action[] ElevatorActions = {Action.Elevator, Action.Wait, Action.Wait, Action.Wait};
+        private static readonly Action[] BlockActions = {Action.Block, Action.Wait, Action.Wait, Action.Wait};
+        private static readonly Action[] MovementActions = {Action.Wait};
 
-        private int _roundsLimit;
-        private int _clonesLimit;
-        private int _additionalElevatorsLimit;
+        private readonly Cell _generator;
+        private readonly Cell _exit;
+        private readonly Cell[,] _grid;
 
-        private Game()
-        {
-        }
+        private readonly int _roundsLimit;
+        private readonly int _clonesLimit;
+        private readonly int _elevatorsLimit;
 
-        public Action[] FindPathActions()
-        {
-            return new PathFinding(_field, _generator, _exit, _roundsLimit, _clonesLimit-1, _additionalElevatorsLimit).FindPathActions();
-        }
+        private List<PathNode> _traversalQueue;
 
-        public static Game Read()
+        private PathNode _current;
+
+        public Game()
         {
             var inputs = Tools.ReadInts();
 
-            var field = CreateField(inputs[0], inputs[1]);
+            _grid = CreateGrid(inputs[0], inputs[1]);
 
-            var game = new Game
-                       {
-                           _roundsLimit = inputs[2],
-                           _clonesLimit = inputs[5],
-                           _additionalElevatorsLimit = inputs[6],
-                           _field = field,
-                           _exit = field[inputs[3], inputs[4]]
-                       };
-
-            game._exit.Feature |= Feature.Exit;
+            _roundsLimit = inputs[2];
+            _clonesLimit = inputs[5] - 1;
+            _elevatorsLimit = inputs[6];
+            _exit = _grid[inputs[3], inputs[4]];
+            _exit.Feature |= Feature.Exit;
 
             for (var i = 0; i < inputs[7]; i++)
             {
                 var coordinates = Tools.ReadInts();
-                game._field[coordinates[0], coordinates[1]].Feature |= Feature.Elevator;
+                _grid[coordinates[0], coordinates[1]].Feature |= Feature.Elevator;
             }
 
-            return game;
+            var cloneInputs = Tools.ReadStrings();
+            var cloneFloor = int.Parse(cloneInputs[0]); // floor of the leading clone
+            var clonePosition = int.Parse(cloneInputs[1]); // position of the leading clone on its floor
+            //var cloneDirection = cloneInputs[2] == "RIGHT" ? Direction.Right : Direction.Left; // direction of the leading clone: LEFT or RIGHT
+
+            _generator = _grid[cloneFloor, clonePosition];
+            _generator.Feature |= Feature.Generator;
         }
 
-        private static Point[,] CreateField(int height, int width)
+        private static Cell[,] CreateGrid(int height, int width)
         {
-            var field = new Point[height, width];
+            var field = new Cell[height, width];
             for (var i = 0; i < height; i++)
             {
                 for (var j = 0; j < width; j++)
                 {
-                    field[i, j] = new Point(i, j);
+                    field[i, j] = new Cell(i, j);
                 }
             }
 
             return field;
         }
 
-        public void SetGenerator(int floor, int position)
-        {
-            _generator = _field[floor, position];
-            _generator.Feature |= Feature.Generator;
-        }
-
         public override string ToString()
         {
             return $"Rounds limit    : {_roundsLimit,3}\n" +
                    $"Clones limit    : {_clonesLimit,3}\n" +
-                   $"Elevators limit : {_additionalElevatorsLimit,3}\n";
-        }
-    }
-
-    public class PathFinding
-    {
-        private static readonly Action[] ElevatorActions = {Action.Elevator, Action.Wait, Action.Wait, Action.Wait};
-        private static readonly Action[] BlockActions = {Action.Block, Action.Wait, Action.Wait, Action.Wait};
-        private static readonly Action[] MovementActions = {Action.Wait};
-
-        private readonly Point[,] _field;
-        private readonly Point _start;
-        private readonly Point _end;
-        private readonly int _costLimit;
-        private readonly int _blocksLimit;
-        private readonly int _elevatorsLimit;
-
-        private List<PathInfo> _traversalQueue;
-
-        private PathInfo _current;
-
-        public PathFinding(Point[,] field, Point start, Point end, int costLimit, int blocksLimit, int elevatorsLimit)
-        {
-            _field = field;
-            _start = start;
-            _end = end;
-            _costLimit = costLimit;
-            _blocksLimit = blocksLimit;
-            _elevatorsLimit = elevatorsLimit;
+                   $"Elevators limit : {_elevatorsLimit,3}\n";
         }
 
         public Action[] FindPathActions()
         {
-            _current = new PathInfo
+            _current = new PathNode
                        {
-                           Point = _start,
+                           Cell = _generator,
                            Parent = null,
                            Cost = 1,
-                           Heuristic = Heuristic(_start, _end),
-                           BlocksUsed = 0,
+                           Rank = 1 + Heuristic(_generator, _exit),
+                           ClonesUsed = 0,
                            ElevatorsUsed = 0,
                            Direction = Direction.Right,
                            Actions = Array.Empty<Action>()
                        };
-            _traversalQueue = new List<PathInfo>();
+            _traversalQueue = new List<PathNode>();
 
-            while (_current.Point != _end)
+            while (_current.Cell != _exit)
             {
-                if (_current.Point.Feature.HasFlag(Feature.Elevator))
+                if (_current.Cell.Feature.HasFlag(Feature.Elevator))
                 {
                     HandleMovementUp();
                 }
@@ -175,33 +121,19 @@ namespace Laconic.Codingame.DontPanicLevel2
             return _current.EnumeratePath().SelectMany(x => x.Actions.Reverse()).Reverse().ToArray();
         }
 
-        private void HandleMovementUp()
-        {
-            HandleMovement(_current.Point.Floor + 1, _current.Point.Position);
-        }
+        private void HandleMovementUp() => HandleMovement(_current.Cell.Floor + 1, _current.Cell.Position);
 
-        private void HandleMovementLateral()
-        {
-            var positionIncrement = _current.Direction == Direction.Right ? 1 : -1;
-            HandleMovement(_current.Point.Floor, _current.Point.Position + positionIncrement);
-        }
+        private void HandleMovementLateral() => HandleMovement(_current.Cell.Floor, _current.Cell.Position + _current.Direction.ToPositionIncrement());
 
-        private void HandleMovement(int y, int x)
-        {
-            HandleNeighbor(y, x, 0, 0, _current.Direction, MovementActions);
-        }
+        private void HandleMovement(int y, int x) => HandleNeighbor(y, x, 0, 0, _current.Direction, MovementActions);
 
-        private void HandleBlock()
-        {
-            var positionIncrement = _current.Direction == Direction.Right ? -1 : 1;
-            HandleNeighbor(_current.Point.Floor, _current.Point.Position + positionIncrement, 1, 0, _current.Direction.Invert(), BlockActions);
-        }
+        private void HandleBlock() => HandleNeighbor(_current.Cell.Floor, _current.Cell.Position - _current.Direction.ToPositionIncrement(), 1, 0, _current.Direction.Invert(), BlockActions);
 
         private void HandleElevator()
         {
             if (ShouldTryNewElevator() == false) return;
 
-            HandleNeighbor(_current.Point.Floor + 1, _current.Point.Position, 0, 1, _current.Direction, ElevatorActions);
+            HandleNeighbor(_current.Cell.Floor + 1, _current.Cell.Position, 1, 1, _current.Direction, ElevatorActions);
         }
 
         private bool ShouldTryNewElevator()
@@ -209,76 +141,77 @@ namespace Laconic.Codingame.DontPanicLevel2
             var elevatorRemaining = _elevatorsLimit - _current.ElevatorsUsed;
             for (var i = 1; i <= elevatorRemaining; i++)
             {
-                var point = _field.GetOrDefault(_current.Point.Floor + i, _current.Point.Position);
-                if (point == null) return false;
-                if (point.Feature.HasFlag(Feature.Elevator) || point.Feature.HasFlag(Feature.Exit)) return true;
+                var cell = _grid.GetOrDefault(_current.Cell.Floor + i, _current.Cell.Position);
+                if (cell == null) return false;
+                if (cell.Feature.HasFlag(Feature.Elevator) || cell.Feature.HasFlag(Feature.Exit)) return true;
             }
+
             return false;
         }
 
-        private void HandleNeighbor(int y, int x, int blocksIncrement, int elevatorsIncrement, Direction direction, Action[] actions)
+        private void HandleNeighbor(int y, int x, int clonesUsed, int elevatorsUsed, Direction direction, Action[] actions)
         {
-            var neighbor = _field.GetOrDefault(y, x);
+            var neighbor = _grid.GetOrDefault(y, x);
             if (neighbor == null) return;
 
             var cost = _current.Cost + actions.Length;
-            if (cost > _costLimit) return;
+            var rank = cost + Heuristic(neighbor, _exit);
+            if (rank > _roundsLimit) return;
 
-            var blocksUsed = _current.BlocksUsed + blocksIncrement;
-            if (blocksUsed > _blocksLimit) return;
+            var clonesTotalUsed = _current.ClonesUsed + clonesUsed;
+            if (clonesTotalUsed > _clonesLimit) return;
 
-            var elevatorsUsed = _current.ElevatorsUsed + elevatorsIncrement;
-            if (elevatorsUsed > _elevatorsLimit) return;
+            var elevatorsTotalUsed = _current.ElevatorsUsed + elevatorsUsed;
+            if (elevatorsTotalUsed > _elevatorsLimit) return;
 
-            if (_current.Parent?.Point == neighbor) return;
+            if (_current.Parent?.Cell == neighbor) return;
 
-            AddToTraversalQueue(new PathInfo
-                         {
-                             Point = neighbor,
-                             Cost = cost,
-                             Heuristic = Heuristic(neighbor, _end),
-                             BlocksUsed = blocksUsed,
-                             ElevatorsUsed = elevatorsUsed,
-                             Parent = _current,
-                             Direction = direction,
-                             Actions = actions
-                         });
+            AddToTraversalQueue(new PathNode
+                                {
+                                    Cell = neighbor,
+                                    Cost = cost,
+                                    Rank = rank,
+                                    ClonesUsed = clonesTotalUsed,
+                                    ElevatorsUsed = elevatorsTotalUsed,
+                                    Parent = _current,
+                                    Direction = direction,
+                                    Actions = actions
+                                });
         }
 
-        private void AddToTraversalQueue(PathInfo pathInfo)
+        private void AddToTraversalQueue(PathNode pathNode)
         {
             var i = 0;
-            while (i < _traversalQueue.Count && _traversalQueue[i].Rank < pathInfo.Rank)
+            while (i < _traversalQueue.Count && _traversalQueue[i].Rank < pathNode.Rank)
             {
                 i += 1;
             }
 
-            _traversalQueue.Insert(i, pathInfo);
+            _traversalQueue.Insert(i, pathNode);
         }
 
-        private static int Heuristic(Point from, Point to)
+        private static int Heuristic(Cell from, Cell to)
         {
             var dx = Math.Abs(from.Position - to.Position);
             var dy = Math.Abs(from.Floor - to.Floor);
             return dx + dy;
         }
 
-        private class PathInfo
+        private class PathNode
         {
-            public Point Point { get; set; }
-            public PathInfo Parent { get; set; }
+            public Cell Cell { get; set; }
+            public PathNode Parent { get; set; }
 
             public int Cost { get; set; }
-            public int Heuristic { get; set; }
-            public int Rank => Cost + Heuristic;
+            public int Rank { get; set; }
 
-            public int BlocksUsed { get; set; }
+            public int ClonesUsed { get; set; }
             public int ElevatorsUsed { get; set; }
 
             public Direction Direction { get; set; }
             public Action[] Actions { get; set; }
 
-            public IEnumerable<PathInfo> EnumeratePath()
+            public IEnumerable<PathNode> EnumeratePath()
             {
                 yield return this;
                 var parent = Parent;
@@ -291,29 +224,22 @@ namespace Laconic.Codingame.DontPanicLevel2
         }
     }
 
-    public class Point
+    public class Cell
     {
         public int Floor { get; }
         public int Position { get; }
-
         public Feature Feature { get; set; }
 
-        public Point(int floor, int position)
+        public Cell(int floor, int position)
         {
             Floor = floor;
             Position = position;
-        }
-
-        public override string ToString()
-        {
-            return $"({Floor},{Position})";
         }
     }
 
     public enum Direction : byte
     {
-        None,
-        Right,
+        Right = 1,
         Left
     }
 
@@ -324,34 +250,26 @@ namespace Laconic.Codingame.DontPanicLevel2
         Generator = 0x01,
         Elevator = 0x02,
         Exit = 0x04,
-        Blocked = 0x08
     }
 
     public enum Action : byte
     {
-        None,
-        Wait,
+        Wait = 1,
         Block,
         Elevator
     }
 
     public static class Tools
     {
-        public static int[] ReadInts()
-        {
-            return ReadStrings().Select(int.Parse).ToArray();
-        }
+        public static int[] ReadInts() => ReadStrings().Select(int.Parse).ToArray();
 
-        public static string[] ReadStrings()
-        {
-            return Console.ReadLine().Split(' ');
-        }
+        public static string[] ReadStrings() => Console.ReadLine().Split(' ');
 
         public static T GetOrDefault<T>(this T[,] array, int y, int x)
         {
-            return y < 0 || y >= array.GetLength(0) || x < 0 || x >= array.GetLength(1)
-                ? default(T)
-                : array[y, x];
+            return y >= 0 && y < array.GetLength(0) && x >= 0 && x < array.GetLength(1)
+                ? array[y, x]
+                : default(T);
         }
 
         public static Direction Invert(this Direction direction)
@@ -362,6 +280,11 @@ namespace Laconic.Codingame.DontPanicLevel2
                 case Direction.Left: return Direction.Right;
                 default: throw new InvalidEnumArgumentException();
             }
+        }
+
+        public static int ToPositionIncrement(this Direction direction)
+        {
+            return direction == Direction.Right ? 1 : -1;
         }
 
         public static string ToGameAction(this Action action)
