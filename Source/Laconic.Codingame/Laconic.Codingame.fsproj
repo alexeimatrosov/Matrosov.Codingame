@@ -54,6 +54,7 @@
     <Compile Include="AsciiArt.fs" />
     <Compile Include="AneoSponsoredPuzzle.fs" />
     <Compile Include="ChuckNorris.fs" />
+    <Compile Include="GenomeSequencing.fs" />
     <Compile Include="HorseRacingDuels.fs" />
     <Compile Include="PowerOfThor.fs" />
     <Compile Include="SkynetTheChasm.fs" />
