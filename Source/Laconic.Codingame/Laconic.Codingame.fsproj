@@ -57,9 +57,10 @@
     <Compile Include="GenomeSequencing.fs" />
     <Compile Include="HorseRacingDuels.fs" />
     <Compile Include="PowerOfThor.fs" />
+    <Compile Include="RollerCoaster.fs" />
     <Compile Include="SkynetTheChasm.fs" />
-    <Compile Include="Temperatures.fs" />
     <Compile Include="TeadsSponsoredContest.fs" />
+    <Compile Include="Temperatures.fs" />
     <Compile Include="ThereIsNoSpoonEpisode1.fs" />
     <Compile Include="War.fs" />
     <Content Include="packages.config" />
