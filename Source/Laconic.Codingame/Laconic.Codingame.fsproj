@@ -64,6 +64,7 @@
     <Compile Include="ThereIsNoSpoonEpisode1.fs" />
     <Compile Include="War.fs" />
     <Content Include="packages.config" />
+    <Compile Include="CgxFormatter.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Core">
