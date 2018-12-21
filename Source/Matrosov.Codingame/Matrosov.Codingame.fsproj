@@ -66,6 +66,7 @@
     <Content Include="packages.config" />
     <Compile Include="CgxFormatter.fs" />
     <Compile Include="SuperComputer.fs" />
+    <Compile Include="Surface.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Core">
