@@ -65,6 +65,7 @@
     <Compile Include="War.fs" />
     <Content Include="packages.config" />
     <Compile Include="CgxFormatter.fs" />
+    <Compile Include="SuperComputer.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Core">
