@@ -2,24 +2,23 @@
 
 open System
 
-let readString() = Console.In.ReadLine();
+let readString() = Console.ReadLine();
 let readInt = readString >> int
 
 let letterWidth = readInt()
 let letterHeight = readInt()
-let text = readString()
-let alphabet = List.init letterHeight (fun i -> readString())
 
-let charToIndex c =
-    match Char.ToLowerInvariant(c) with
-    | c when 'a' <= c && c <= 'z' -> int c - int 'a'
-    | _ -> 26
+let textIndices =
+    readString()
+    |> Seq.map Char.ToLowerInvariant
+    |> Seq.map (fun c -> if 'a' <= c && c <= 'z' then int c - int 'a' else 26)
+    |> Array.ofSeq
 
-text.ToCharArray()
-|> Array.map charToIndex
-|> Array.create letterHeight
-|> Array.mapi (fun row letterIndexes ->
-    letterIndexes
-    |> Array.map (fun i -> alphabet.[row].Substring(i * letterWidth, letterWidth))
+let alphabet = Array.init letterHeight (fun _ -> readString())
+
+seq {0..letterHeight-1}
+|> Seq.map (fun r ->
+    textIndices
+    |> Seq.map (fun c -> alphabet.[r].Substring(c * letterWidth, letterWidth))
     |> String.concat "")
-|> Array.iter (fun x -> printfn "%s" x)
+|> Seq.iter (printfn "%s")
