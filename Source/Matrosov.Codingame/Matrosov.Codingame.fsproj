@@ -53,6 +53,7 @@
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="AsciiArt.fs" />
     <Compile Include="AneoSponsoredPuzzle.fs" />
+    <Compile Include="CgxFormatter.fs" />
     <Compile Include="ChuckNorris.fs" />
     <Compile Include="GenomeSequencing.fs" />
     <Compile Include="HorseRacingDuals.fs" />
@@ -60,14 +61,13 @@
     <Compile Include="RollerCoaster.fs" />
     <Compile Include="SkynetTheChasm.fs" />
     <Compile Include="SkynetTheBridge.fs" />
+    <Compile Include="SuperComputer.fs" />
+    <Compile Include="Surface.fs" />
     <Compile Include="TeadsSponsoredContest.fs" />
     <Compile Include="Temperatures.fs" />
     <Compile Include="ThereIsNoSpoonEpisode1.fs" />
     <Compile Include="War.fs" />
     <Content Include="packages.config" />
-    <Compile Include="CgxFormatter.fs" />
-    <Compile Include="SuperComputer.fs" />
-    <Compile Include="Surface.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Core">

@@ -39,8 +39,7 @@ let checkSpeed (speed:float<kph>) =
     trafficLights
     |> Seq.forall (fun x -> isGreen speed x)
 
-let speed =
-    seq { for s in speedLimit .. -1 .. 1 do if checkSpeed ((float s) * 1.0<kph>) then yield s }
-    |> Seq.head
-
-printfn "%d" speed
+seq { speedLimit .. -1 .. 1 }
+|> Seq.filter (fun s -> checkSpeed ((float s) * 1.0<kph>))
+|> Seq.head
+|> printfn "%d"
