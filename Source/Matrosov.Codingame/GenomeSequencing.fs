@@ -42,10 +42,9 @@ let concat s1 s2 =
         concatCache <- concatCache |> Map.add (s1, s2) result
         result
 
-let answer =
-    List.init (readInt()) (fun _ -> readString())
-    |> permutate
-    |> Seq.map (fun p -> p |> List.reduce concat)
-    |> Seq.minBy (fun s -> s.Length)
-
-printf "%d" answer.Length
+List.init (readInt()) (fun _ -> readString())
+|> permutate
+|> Seq.map (fun p -> p |> List.reduce concat)
+|> Seq.minBy (fun s -> s.Length)
+|> Seq.length
+|> printf "%d"

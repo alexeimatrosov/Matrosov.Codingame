@@ -53,6 +53,7 @@
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="AsciiArt.fs" />
     <Compile Include="AneoSponsoredPuzzle.fs" />
+    <Compile Include="BenderEpisode3.fs" />
     <Compile Include="CgxFormatter.fs" />
     <Compile Include="ChuckNorris.fs" />
     <Compile Include="GenomeSequencing.fs" />
