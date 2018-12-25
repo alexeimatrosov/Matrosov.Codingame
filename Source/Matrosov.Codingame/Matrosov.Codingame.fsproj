@@ -64,6 +64,7 @@
     <Compile Include="SkynetTheBridge.fs" />
     <Compile Include="SuperComputer.fs" />
     <Compile Include="Surface.fs" />
+    <Compile Include="TanNetwork.fs" />
     <Compile Include="TeadsSponsoredContest.fs" />
     <Compile Include="Temperatures.fs" />
     <Compile Include="ThereIsNoSpoonEpisode1.fs" />
