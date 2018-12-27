@@ -68,6 +68,7 @@
     <Compile Include="TeadsSponsoredContest.fs" />
     <Compile Include="Temperatures.fs" />
     <Compile Include="ThereIsNoSpoonEpisode1.fs" />
+    <Compile Include="VoxCodeiEpisode1.fs" />
     <Compile Include="War.fs" />
     <Content Include="packages.config" />
   </ItemGroup>
