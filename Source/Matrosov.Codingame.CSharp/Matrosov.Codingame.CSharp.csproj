@@ -33,7 +33,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>Matrosov.Codingame.CSharp.BenderEpisode2Program</StartupObject>
+    <StartupObject>Matrosov.Codingame.CSharp.Hard.BenderEpisode2.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -45,13 +45,25 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BenderEpisode2Program.cs" />
-    <Compile Include="NetworkCablingProgram.cs" />
+    <Compile Include="Contests\PlatinumRift\Program.cs" />
+    <Compile Include="Hard\BenderEpisode2\Program.cs" />
+    <Compile Include="Hard\DontPanicEpisode2\Program.cs" />
+    <Compile Include="Contests\GameOfDrones\Program.cs" />
+    <Compile Include="Hard\SkynetRevolutionEpisode2\Program.cs" />
+    <Compile Include="Hard\TheLabyrinth\Program.cs" />
+    <Compile Include="Medium\DwarfsOnGiants\Program.cs" />
+    <Compile Include="Medium\MarsLanderEpisode2\Program.cs" />
+    <Compile Include="Medium\MayanCalculation\Program.cs" />
+    <Compile Include="Medium\NetworkCabling\Program.cs" />
+    <Compile Include="Medium\Scrabble\Program.cs" />
+    <Compile Include="Medium\TeadsSponsoredContest\Program.cs" />
+    <Compile Include="Medium\TelephoneNumbers\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

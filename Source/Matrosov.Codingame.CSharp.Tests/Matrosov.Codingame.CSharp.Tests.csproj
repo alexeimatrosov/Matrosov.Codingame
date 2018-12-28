@@ -48,117 +48,117 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BenderEpisode2ProgramTests.cs" />
-    <Compile Include="NetworkCablingProgramTests.cs" />
+    <Compile Include="Hard\BenderEpisode2\ProgramTests.cs" />
+    <Compile Include="Medium\NetworkCabling\ProgramTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="TestCases\BenderEpisode2\in01.txt">
+    <Content Include="Hard\BenderEpisode2\TestCases\in01.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestCases\BenderEpisode2\in02.txt">
+    <Content Include="Hard\BenderEpisode2\TestCases\in02.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestCases\BenderEpisode2\in03.txt">
+    <Content Include="Hard\BenderEpisode2\TestCases\in03.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestCases\BenderEpisode2\in04.txt">
+    <Content Include="Hard\BenderEpisode2\TestCases\in04.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestCases\BenderEpisode2\in05.txt">
+    <Content Include="Hard\BenderEpisode2\TestCases\in05.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestCases\BenderEpisode2\in06.txt">
+    <Content Include="Hard\BenderEpisode2\TestCases\in06.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestCases\BenderEpisode2\in07.txt">
+    <Content Include="Hard\BenderEpisode2\TestCases\in07.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestCases\BenderEpisode2\in08.txt">
+    <Content Include="Hard\BenderEpisode2\TestCases\in08.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestCases\BenderEpisode2\in09.txt">
+    <Content Include="Hard\BenderEpisode2\TestCases\in09.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestCases\BenderEpisode2\out01.txt">
+    <Content Include="Hard\BenderEpisode2\TestCases\out01.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestCases\BenderEpisode2\out02.txt">
+    <Content Include="Hard\BenderEpisode2\TestCases\out02.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestCases\BenderEpisode2\out03.txt">
+    <Content Include="Hard\BenderEpisode2\TestCases\out03.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestCases\BenderEpisode2\out04.txt">
+    <Content Include="Hard\BenderEpisode2\TestCases\out04.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestCases\BenderEpisode2\out05.txt">
+    <Content Include="Hard\BenderEpisode2\TestCases\out05.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestCases\BenderEpisode2\out06.txt">
+    <Content Include="Hard\BenderEpisode2\TestCases\out06.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestCases\BenderEpisode2\out07.txt">
+    <Content Include="Hard\BenderEpisode2\TestCases\out07.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestCases\BenderEpisode2\out08.txt">
+    <Content Include="Hard\BenderEpisode2\TestCases\out08.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestCases\BenderEpisode2\out09.txt">
+    <Content Include="Hard\BenderEpisode2\TestCases\out09.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestCases\NetworkCabling\in1.txt">
+    <Content Include="Medium\NetworkCabling\TestCases\in1.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestCases\NetworkCabling\in2.txt">
+    <Content Include="Medium\NetworkCabling\TestCases\in2.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestCases\NetworkCabling\in3.txt">
+    <Content Include="Medium\NetworkCabling\TestCases\in3.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestCases\NetworkCabling\in4.txt">
+    <Content Include="Medium\NetworkCabling\TestCases\in4.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestCases\NetworkCabling\in5.txt">
+    <Content Include="Medium\NetworkCabling\TestCases\in5.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestCases\NetworkCabling\in6.txt">
+    <Content Include="Medium\NetworkCabling\TestCases\in6.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestCases\NetworkCabling\in7.txt">
+    <Content Include="Medium\NetworkCabling\TestCases\in7.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestCases\NetworkCabling\in8.txt">
+    <Content Include="Medium\NetworkCabling\TestCases\in8.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestCases\NetworkCabling\in9.txt">
+    <Content Include="Medium\NetworkCabling\TestCases\in9.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestCases\NetworkCabling\out1.txt">
+    <Content Include="Medium\NetworkCabling\TestCases\out1.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestCases\NetworkCabling\out2.txt">
+    <Content Include="Medium\NetworkCabling\TestCases\out2.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestCases\NetworkCabling\out3.txt">
+    <Content Include="Medium\NetworkCabling\TestCases\out3.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestCases\NetworkCabling\out4.txt">
+    <Content Include="Medium\NetworkCabling\TestCases\out4.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestCases\NetworkCabling\out5.txt">
+    <Content Include="Medium\NetworkCabling\TestCases\out5.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestCases\NetworkCabling\out6.txt">
+    <Content Include="Medium\NetworkCabling\TestCases\out6.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestCases\NetworkCabling\out7.txt">
+    <Content Include="Medium\NetworkCabling\TestCases\out7.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestCases\NetworkCabling\out8.txt">
+    <Content Include="Medium\NetworkCabling\TestCases\out8.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestCases\NetworkCabling\out9.txt">
+    <Content Include="Medium\NetworkCabling\TestCases\out9.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
@@ -171,6 +171,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
