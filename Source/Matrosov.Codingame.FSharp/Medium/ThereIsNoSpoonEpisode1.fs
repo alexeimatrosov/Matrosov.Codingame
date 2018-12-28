@@ -2,19 +2,14 @@
 
 open System
 
-let readString() = Console.In.ReadLine();
+let readString() = Console.ReadLine();
 let readInt = readString >> int
+let readRow() = readString() |> Seq.map (fun c -> if c = '0' then 1 else 0) |> Seq.toArray
 
 let width = readInt()
 let height = readInt()
 
-let readRow() = readString()
-                |> Seq.map (fun c -> if c = '0' then 1 else 0)
-                |> Seq.toArray
-
-let field =
-    seq { for _ in 1 .. height do yield readRow() }
-    |> Seq.toArray
+let field = Array.init height (fun _ -> readRow())
 
 let rec findNeighbour dx dy x y =
     let xn = x + dx

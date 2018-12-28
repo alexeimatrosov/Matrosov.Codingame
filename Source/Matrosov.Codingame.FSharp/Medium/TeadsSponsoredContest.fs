@@ -20,7 +20,7 @@ let graph =
 
 let mutable visited : Set<int> = Set.empty
 
-let rec visit node depth =
+let rec visit depth node =
     seq {
         yield depth
         for i in graph.[node] do
@@ -31,8 +31,8 @@ let rec visit node depth =
     }
     |> Seq.max
 
-let leaf = graph |> Map.pick (fun k v -> if v.Count = 1 then Some k else None)
-
-let maxDepth = visit leaf 0
-
-printfn "%d" (maxDepth / 2 + maxDepth % 2)
+graph
+|> Map.pick (fun k v -> if v.Count = 1 then Some k else None)
+|> visit 0
+|> (fun maxDepth -> maxDepth / 2 + maxDepth % 2)
+|> printfn "%d"

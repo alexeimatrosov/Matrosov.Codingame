@@ -4,11 +4,11 @@ open System
 
 let readString() = Console.ReadLine()
 let readInt = readString >> int
-let readPair() = readString().Split [|' '|] |> Array.map float |> (fun a -> (a.[0], a.[1]))
+let readFloatPair() = readString().Split(' ') |> Array.map float |> (fun a -> (a.[0], a.[1]))
 
 let log2 x = log x / log 2.0
 
-let data = Array.init (readInt()) (fun _ -> readPair())
+let data = Array.init (readInt()) (fun _ -> readFloatPair())
 
 let calculateVariance (_, f) =
     let coefficient =

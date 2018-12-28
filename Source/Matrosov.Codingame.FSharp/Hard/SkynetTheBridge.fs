@@ -4,7 +4,7 @@ open System
 
 let readString() = Console.ReadLine();
 let readInt = readString >> int
-let readBike() = readString().Split [|' '|] |> Array.map int |> (fun a -> a.[0], a.[1], a.[2] > 0)
+let readBike() = readString().Split(' ') |> Array.map int |> (fun a -> a.[0], a.[1], a.[2] > 0)
 
 let bikesCount = readInt()
 let bikesToSurvive = readInt()

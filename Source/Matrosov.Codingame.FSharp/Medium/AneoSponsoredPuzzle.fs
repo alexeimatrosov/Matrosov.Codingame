@@ -16,7 +16,7 @@ let toKilometersPerHour (x:float<m/s>) = x * 3600.0<s> / 1000.0<m> * 1.0<kph>
 let getTime (distance:float<m>) (speed:float<kph>) = distance / (speed |> toMetersPerSecond)
 let getSpeed (distance:float<m>) (time:float<s>) = (distance / time) |> toKilometersPerHour
 
-let readString() = Console.In.ReadLine();
+let readString() = Console.ReadLine();
 let readInt = readString >> int
 
 let readTrafficLight() =

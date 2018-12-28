@@ -2,7 +2,7 @@
 
 open System
 
-let byteToBits (b:byte) = [|for i in 6..-1..0 -> (b >>> i) &&& 1uy|]
+let byteToBits (b : byte) = [|for i in 6..-1..0 -> (b >>> i) &&& 1uy|]
 
 Console.In.ReadLine()
 |> Seq.collect (byte >> byteToBits)
