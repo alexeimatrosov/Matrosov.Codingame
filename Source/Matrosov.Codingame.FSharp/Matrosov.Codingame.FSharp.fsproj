@@ -50,6 +50,7 @@
   </Choose>
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
+    <Compile Include="AssemblyInfo.fs" />
     <Compile Include="Easy\AsciiArt.fs" />
     <Compile Include="Easy\ChuckNorris.fs" />
     <Compile Include="Easy\HorseRacingDuals.fs" />
@@ -69,7 +70,6 @@
     <Compile Include="Hard\Surface.fs" />
     <Compile Include="Hard\TanNetwork.fs" />
     <Compile Include="Hard\VoxCodeiEpisode1.fs" />
-    <Compile Include="AssemblyInfo.fs" />
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

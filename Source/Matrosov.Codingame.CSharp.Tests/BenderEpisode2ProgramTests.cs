@@ -3,12 +3,12 @@ using System.IO;
 using System.Linq;
 using NUnit.Framework;
 
-namespace Matrosov.Codingame.Tests.BenderTheMoneyMachine
+namespace Matrosov.Codingame.CSharp.Tests
 {
     [TestFixture]
-    public class ProgramTests
+    public class BenderEpisode2ProgramTests
     {
-        private static readonly string TestCasesDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "BenderTheMoneyMachine");
+        private static readonly string TestCasesDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TestCases/BenderEpisode2");
 
         private static readonly object[] TestCases =
         {
@@ -30,7 +30,7 @@ namespace Matrosov.Codingame.Tests.BenderTheMoneyMachine
             Console.SetIn(File.OpenText(Path.Combine(TestCasesDirectory, inFile)));
             Console.SetOut(sw);
 
-            Codingame.BenderTheMoneyMachine.Program.Main();
+            BenderEpisode2Program.Main();
 
             Assert.That(int.Parse(sw.ToString()), Is.EqualTo(int.Parse(File.ReadLines(Path.Combine(TestCasesDirectory, outFile)).First())));
         }

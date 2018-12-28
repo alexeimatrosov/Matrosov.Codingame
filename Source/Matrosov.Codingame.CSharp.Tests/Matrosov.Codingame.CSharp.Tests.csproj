@@ -8,8 +8,8 @@
     <ProjectGuid>{0F54B9F5-2CA1-49DF-90C1-DD2FB8602DE7}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Matrosov.Codingame.Tests</RootNamespace>
-    <AssemblyName>Matrosov.Codingame.Tests</AssemblyName>
+    <RootNamespace>Matrosov.Codingame.CSharp.Tests</RootNamespace>
+    <AssemblyName>Matrosov.Codingame.CSharp.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
@@ -48,128 +48,124 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BenderTheMoneyMachine\ProgramTests.cs" />
-    <Compile Include="NetworkCabling\ProgramTests.cs" />
+    <Compile Include="BenderEpisode2ProgramTests.cs" />
+    <Compile Include="NetworkCablingProgramTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="BenderTheMoneyMachine\in01.txt">
+    <Content Include="TestCases\BenderEpisode2\in01.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="BenderTheMoneyMachine\in02.txt">
+    <Content Include="TestCases\BenderEpisode2\in02.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="BenderTheMoneyMachine\in03.txt">
+    <Content Include="TestCases\BenderEpisode2\in03.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="BenderTheMoneyMachine\in04.txt">
+    <Content Include="TestCases\BenderEpisode2\in04.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="BenderTheMoneyMachine\in05.txt">
+    <Content Include="TestCases\BenderEpisode2\in05.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="BenderTheMoneyMachine\in06.txt">
+    <Content Include="TestCases\BenderEpisode2\in06.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="BenderTheMoneyMachine\in07.txt">
+    <Content Include="TestCases\BenderEpisode2\in07.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="BenderTheMoneyMachine\in08.txt">
+    <Content Include="TestCases\BenderEpisode2\in08.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="BenderTheMoneyMachine\in09.txt">
+    <Content Include="TestCases\BenderEpisode2\in09.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="BenderTheMoneyMachine\out01.txt">
+    <Content Include="TestCases\BenderEpisode2\out01.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="BenderTheMoneyMachine\out02.txt">
+    <Content Include="TestCases\BenderEpisode2\out02.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="BenderTheMoneyMachine\out03.txt">
+    <Content Include="TestCases\BenderEpisode2\out03.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="BenderTheMoneyMachine\out04.txt">
+    <Content Include="TestCases\BenderEpisode2\out04.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="BenderTheMoneyMachine\out05.txt">
+    <Content Include="TestCases\BenderEpisode2\out05.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="BenderTheMoneyMachine\out06.txt">
+    <Content Include="TestCases\BenderEpisode2\out06.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="BenderTheMoneyMachine\out07.txt">
+    <Content Include="TestCases\BenderEpisode2\out07.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="BenderTheMoneyMachine\out08.txt">
+    <Content Include="TestCases\BenderEpisode2\out08.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="BenderTheMoneyMachine\out09.txt">
+    <Content Include="TestCases\BenderEpisode2\out09.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="NetworkCabling\in1.txt">
+    <Content Include="TestCases\NetworkCabling\in1.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="NetworkCabling\in2.txt">
+    <Content Include="TestCases\NetworkCabling\in2.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="NetworkCabling\in3.txt">
+    <Content Include="TestCases\NetworkCabling\in3.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="NetworkCabling\in4.txt">
+    <Content Include="TestCases\NetworkCabling\in4.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="NetworkCabling\in5.txt">
+    <Content Include="TestCases\NetworkCabling\in5.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="NetworkCabling\in6.txt">
+    <Content Include="TestCases\NetworkCabling\in6.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="NetworkCabling\in7.txt">
+    <Content Include="TestCases\NetworkCabling\in7.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="NetworkCabling\in8.txt">
+    <Content Include="TestCases\NetworkCabling\in8.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="NetworkCabling\in9.txt">
+    <Content Include="TestCases\NetworkCabling\in9.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="NetworkCabling\out1.txt">
+    <Content Include="TestCases\NetworkCabling\out1.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="NetworkCabling\out2.txt">
+    <Content Include="TestCases\NetworkCabling\out2.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="NetworkCabling\out3.txt">
+    <Content Include="TestCases\NetworkCabling\out3.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="NetworkCabling\out4.txt">
+    <Content Include="TestCases\NetworkCabling\out4.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="NetworkCabling\out5.txt">
+    <Content Include="TestCases\NetworkCabling\out5.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="NetworkCabling\out6.txt">
+    <Content Include="TestCases\NetworkCabling\out6.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="NetworkCabling\out7.txt">
+    <Content Include="TestCases\NetworkCabling\out7.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="NetworkCabling\out8.txt">
+    <Content Include="TestCases\NetworkCabling\out8.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="NetworkCabling\out9.txt">
+    <Content Include="TestCases\NetworkCabling\out9.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Matrosov.Codingame.BenderTheMoneyMachine\Matrosov.Codingame.BenderTheMoneyMachine.csproj">
+    <ProjectReference Include="..\Matrosov.Codingame.CSharp\Matrosov.Codingame.CSharp.csproj">
       <Project>{87b807ea-b771-4f00-8aed-a5592c07ecdb}</Project>
-      <Name>Matrosov.Codingame.BenderTheMoneyMachine</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Matrosov.Codingame.NetworkCabling\Matrosov.Codingame.NetworkCabling.csproj">
-      <Project>{e98fcd78-3b93-47c6-8734-1fbcccf3aa48}</Project>
-      <Name>Matrosov.Codingame.NetworkCabling</Name>
+      <Name>Matrosov.Codingame.CSharp</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

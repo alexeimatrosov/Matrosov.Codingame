@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26730.15
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Matrosov.Codingame.BenderTheMoneyMachine", "Matrosov.Codingame.BenderTheMoneyMachine\Matrosov.Codingame.BenderTheMoneyMachine.csproj", "{87B807EA-B771-4F00-8AED-A5592C07ECDB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Matrosov.Codingame.CSharp", "Matrosov.Codingame.CSharp\Matrosov.Codingame.CSharp.csproj", "{87B807EA-B771-4F00-8AED-A5592C07ECDB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{E18BE2D2-697A-4ADF-801C-F824BA60773D}"
 EndProject
@@ -13,9 +13,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Matrosov.Codingame.DontPani
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Matrosov.Codingame.PlatinumRift", "Matrosov.Codingame.PlatinumRift\Matrosov.Codingame.PlatinumRift.csproj", "{47777B91-8EE7-4771-A4D6-9500351B3857}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Matrosov.Codingame.NetworkCabling", "Matrosov.Codingame.NetworkCabling\Matrosov.Codingame.NetworkCabling.csproj", "{E98FCD78-3B93-47C6-8734-1FBCCCF3AA48}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Matrosov.Codingame.Tests", "Matrosov.Codingame.Tests\Matrosov.Codingame.Tests.csproj", "{0F54B9F5-2CA1-49DF-90C1-DD2FB8602DE7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Matrosov.Codingame.CSharp.Tests", "Matrosov.Codingame.CSharp.Tests\Matrosov.Codingame.CSharp.Tests.csproj", "{0F54B9F5-2CA1-49DF-90C1-DD2FB8602DE7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Matrosov.Codingame.DwarfsOnGiants", "Matrosov.Codingame.DwarfsOnGiants\Matrosov.Codingame.DwarfsOnGiants.csproj", "{7A34DD40-2873-4C0C-B8D8-7B0D982F2851}"
 EndProject
@@ -57,10 +55,6 @@ Global
 		{47777B91-8EE7-4771-A4D6-9500351B3857}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{47777B91-8EE7-4771-A4D6-9500351B3857}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{47777B91-8EE7-4771-A4D6-9500351B3857}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E98FCD78-3B93-47C6-8734-1FBCCCF3AA48}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E98FCD78-3B93-47C6-8734-1FBCCCF3AA48}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E98FCD78-3B93-47C6-8734-1FBCCCF3AA48}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E98FCD78-3B93-47C6-8734-1FBCCCF3AA48}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0F54B9F5-2CA1-49DF-90C1-DD2FB8602DE7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0F54B9F5-2CA1-49DF-90C1-DD2FB8602DE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0F54B9F5-2CA1-49DF-90C1-DD2FB8602DE7}.Release|Any CPU.ActiveCfg = Release|Any CPU

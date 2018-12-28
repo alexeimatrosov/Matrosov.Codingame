@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
 
-namespace Matrosov.Codingame.NetworkCabling
+namespace Matrosov.Codingame.CSharp
 {
-    public class Program
+    public class NetworkCablingProgram
     {
         public static void Main()
         {

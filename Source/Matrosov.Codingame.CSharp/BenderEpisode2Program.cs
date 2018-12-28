@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
 
-namespace Matrosov.Codingame.BenderTheMoneyMachine
+namespace Matrosov.Codingame.CSharp
 {
-    public class Program
+    public class BenderEpisode2Program
     {
         public static void Main()
         {

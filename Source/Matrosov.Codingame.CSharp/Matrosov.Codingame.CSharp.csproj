@@ -7,8 +7,8 @@
     <ProjectGuid>{87B807EA-B771-4F00-8AED-A5592C07ECDB}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Matrosov.Codingame.BenderTheMoneyMachine</RootNamespace>
-    <AssemblyName>Matrosov.Codingame.BenderTheMoneyMachine</AssemblyName>
+    <RootNamespace>Matrosov.Codingame.CSharp</RootNamespace>
+    <AssemblyName>Matrosov.Codingame.CSharp</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -32,6 +32,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>Matrosov.Codingame.CSharp.BenderEpisode2Program</StartupObject>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -42,7 +45,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
+    <Compile Include="BenderEpisode2Program.cs" />
+    <Compile Include="NetworkCablingProgram.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

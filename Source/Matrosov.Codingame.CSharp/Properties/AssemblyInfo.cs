@@ -1,15 +1,14 @@
 ﻿using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Matrosov.Codingame.Tests")]
+[assembly: AssemblyTitle("Matrosov.Codingame.CSharp")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Matrosov.Codingame.Tests")]
+[assembly: AssemblyProduct("Matrosov.Codingame.CSharp")]
 [assembly: AssemblyCopyright("Copyright ©  2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +19,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("2598e942-b3f6-40ba-bd6a-5f762a6403a1")]
+[assembly: Guid("e17d6f76-12ea-47af-8e49-a59631691f2c")]
 
 // Version information for an assembly consists of the following four values:
 //

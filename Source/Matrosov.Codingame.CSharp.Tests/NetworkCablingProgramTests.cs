@@ -3,12 +3,12 @@ using System.IO;
 using System.Linq;
 using NUnit.Framework;
 
-namespace Matrosov.Codingame.Tests.NetworkCabling
+namespace Matrosov.Codingame.CSharp.Tests
 {
     [TestFixture]
-    public class ProgramTests
+    public class NetworkCablingProgramTests
     {
-        private static readonly string TestCasesDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "NetworkCabling");
+        private static readonly string TestCasesDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TestCases/NetworkCabling");
 
         private static readonly object[] TestCases =
         {
@@ -30,7 +30,7 @@ namespace Matrosov.Codingame.Tests.NetworkCabling
             Console.SetIn(File.OpenText(Path.Combine(TestCasesDirectory, inFile)));
             Console.SetOut(sw);
 
-            Codingame.NetworkCabling.Program.Main();
+            NetworkCablingProgram.Main();
 
             Assert.That(long.Parse(sw.ToString()), Is.EqualTo(long.Parse(File.ReadLines(Path.Combine(TestCasesDirectory, outFile)).First())));
         }
