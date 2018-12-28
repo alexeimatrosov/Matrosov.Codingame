@@ -1,4 +1,4 @@
-﻿module Matrosov.Codingame.GenomeSequencing
+﻿module Matrosov.Codingame.Hard.GenomeSequencing
 
 open System
 

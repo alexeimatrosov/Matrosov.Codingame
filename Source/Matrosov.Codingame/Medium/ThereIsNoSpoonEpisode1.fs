@@ -1,4 +1,4 @@
-﻿module Matrosov.Codingame.ThereIsNoSpoonEpisode1
+﻿module Matrosov.Codingame.Medium.ThereIsNoSpoonEpisode1
 
 open System
 

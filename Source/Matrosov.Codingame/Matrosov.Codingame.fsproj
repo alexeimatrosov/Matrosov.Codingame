@@ -50,26 +50,26 @@
   </Choose>
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
+    <Compile Include="Easy\AsciiArt.fs" />
+    <Compile Include="Easy\ChuckNorris.fs" />
+    <Compile Include="Easy\HorseRacingDuals.fs" />
+    <Compile Include="Easy\PowerOfThor.fs" />
+    <Compile Include="Easy\SkynetTheChasm.fs" />
+    <Compile Include="Easy\Temperatures.fs" />
+    <Compile Include="Medium\AneoSponsoredPuzzle.fs" />
+    <Compile Include="Medium\TeadsSponsoredContest.fs" />
+    <Compile Include="Medium\ThereIsNoSpoonEpisode1.fs" />
+    <Compile Include="Medium\War.fs" />
+    <Compile Include="Hard\BenderEpisode3.fs" />
+    <Compile Include="Hard\CgxFormatter.fs" />
+    <Compile Include="Hard\GenomeSequencing.fs" />
+    <Compile Include="Hard\RollerCoaster.fs" />
+    <Compile Include="Hard\SkynetTheBridge.fs" />
+    <Compile Include="Hard\SuperComputer.fs" />
+    <Compile Include="Hard\Surface.fs" />
+    <Compile Include="Hard\TanNetwork.fs" />
+    <Compile Include="Hard\VoxCodeiEpisode1.fs" />
     <Compile Include="AssemblyInfo.fs" />
-    <Compile Include="AsciiArt.fs" />
-    <Compile Include="AneoSponsoredPuzzle.fs" />
-    <Compile Include="BenderEpisode3.fs" />
-    <Compile Include="CgxFormatter.fs" />
-    <Compile Include="ChuckNorris.fs" />
-    <Compile Include="GenomeSequencing.fs" />
-    <Compile Include="HorseRacingDuals.fs" />
-    <Compile Include="PowerOfThor.fs" />
-    <Compile Include="RollerCoaster.fs" />
-    <Compile Include="SkynetTheChasm.fs" />
-    <Compile Include="SkynetTheBridge.fs" />
-    <Compile Include="SuperComputer.fs" />
-    <Compile Include="Surface.fs" />
-    <Compile Include="TanNetwork.fs" />
-    <Compile Include="TeadsSponsoredContest.fs" />
-    <Compile Include="Temperatures.fs" />
-    <Compile Include="ThereIsNoSpoonEpisode1.fs" />
-    <Compile Include="VoxCodeiEpisode1.fs" />
-    <Compile Include="War.fs" />
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

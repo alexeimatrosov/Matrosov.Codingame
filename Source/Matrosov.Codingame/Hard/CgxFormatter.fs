@@ -1,4 +1,4 @@
-﻿module Matrosov.Codingame.CgxFormatter
+﻿module Matrosov.Codingame.Hard.CgxFormatter
 
 open System
 open System.Text.RegularExpressions

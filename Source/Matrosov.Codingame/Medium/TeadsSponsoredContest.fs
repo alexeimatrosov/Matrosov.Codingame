@@ -1,4 +1,4 @@
-﻿module Matrosov.Codingame.TeadsSponsoredContest
+﻿module Matrosov.Codingame.Medium.TeadsSponsoredContest
 
 open System
 

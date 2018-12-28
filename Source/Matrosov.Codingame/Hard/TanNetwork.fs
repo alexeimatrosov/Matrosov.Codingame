@@ -1,4 +1,4 @@
-﻿module Matrosov.Codingame.TanNetwork
+﻿module Matrosov.Codingame.Hard.TanNetwork
 
 open System
 open System.Collections.Generic

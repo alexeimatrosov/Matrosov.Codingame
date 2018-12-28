@@ -1,4 +1,4 @@
-﻿module Matrosov.Codingame.Temperatures
+﻿module Matrosov.Codingame.Easy.Temperatures
 
 open System
 

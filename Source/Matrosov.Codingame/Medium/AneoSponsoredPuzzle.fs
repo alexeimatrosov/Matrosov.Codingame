@@ -1,4 +1,4 @@
-﻿module Matrosov.Codingame.AneoSponsoredPuzzle
+﻿module Matrosov.Codingame.Medium.AneoSponsoredPuzzle
 
 open System
 open FSharp.Data.UnitSystems.SI.UnitSymbols

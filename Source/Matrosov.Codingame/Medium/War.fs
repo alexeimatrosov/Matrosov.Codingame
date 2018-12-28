@@ -1,4 +1,4 @@
-﻿module Matrosov.Codingame.War
+﻿module Matrosov.Codingame.Medium.War
 
 open System
 
