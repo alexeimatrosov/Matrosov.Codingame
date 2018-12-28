@@ -1,4 +1,4 @@
-﻿module Matrosov.Codingame.Hard.Surface
+﻿module Matrosov.Codingame.FSharp.Hard.Surface
 
 open System
 

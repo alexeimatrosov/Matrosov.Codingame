@@ -1,4 +1,4 @@
-﻿module Matrosov.Codingame.Hard.BenderEpisode3
+﻿module Matrosov.Codingame.FSharp.Hard.BenderEpisode3
 
 open System
 

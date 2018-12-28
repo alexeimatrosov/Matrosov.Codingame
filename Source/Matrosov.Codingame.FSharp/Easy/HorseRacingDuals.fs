@@ -1,4 +1,4 @@
-﻿module Matrosov.Codingame.Easy.HorseRacingDuals
+﻿module Matrosov.Codingame.FSharp.Easy.HorseRacingDuals
 
 open System
 

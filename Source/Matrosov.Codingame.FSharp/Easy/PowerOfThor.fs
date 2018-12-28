@@ -1,4 +1,4 @@
-﻿module Matrosov.Codingame.Easy.PowerOfThor
+﻿module Matrosov.Codingame.FSharp.Easy.PowerOfThor
 
 open System
 

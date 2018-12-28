@@ -1,4 +1,4 @@
-﻿module Matrosov.Codingame.Easy.AsciiArt
+﻿module Matrosov.Codingame.FSharp.Easy.AsciiArt
 
 open System
 

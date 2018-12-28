@@ -1,4 +1,4 @@
-﻿module Matrosov.Codingame.Hard.SkynetTheBridge
+﻿module Matrosov.Codingame.FSharp.Hard.SkynetTheBridge
 
 open System
 

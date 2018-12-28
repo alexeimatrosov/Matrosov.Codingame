@@ -29,7 +29,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Matrosov.Codingame.SkynetFi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Matrosov.Codingame.KirksQuestTheLabyrinth", "Matrosov.Codingame.KirksQuestTheLabyrinth\Matrosov.Codingame.KirksQuestTheLabyrinth.csproj", "{C739E757-5B59-40AF-AA1A-551308D9D4C0}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Matrosov.Codingame", "Matrosov.Codingame\Matrosov.Codingame.fsproj", "{A856E291-BAF0-4634-8B5A-42E69316DA17}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Matrosov.Codingame.FSharp", "Matrosov.Codingame.FSharp\Matrosov.Codingame.FSharp.fsproj", "{A856E291-BAF0-4634-8B5A-42E69316DA17}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Matrosov.Codingame.MarsLanderEpisode2", "Matrosov.Codingame.MarsLanderEpisode2\Matrosov.Codingame.MarsLanderEpisode2.csproj", "{BDE6CE22-3A5E-4490-B863-CFD39F2DA5B1}"
 EndProject

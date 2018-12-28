@@ -1,4 +1,4 @@
-﻿module Matrosov.Codingame.Hard.RollerCoaster
+﻿module Matrosov.Codingame.FSharp.Hard.RollerCoaster
 
 open System
 

@@ -1,4 +1,4 @@
-﻿module Matrosov.Codingame.Hard.SuperComputer
+﻿module Matrosov.Codingame.FSharp.Hard.SuperComputer
 
 open System
 

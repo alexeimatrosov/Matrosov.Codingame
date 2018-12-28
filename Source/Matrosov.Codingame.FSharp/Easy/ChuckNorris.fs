@@ -1,4 +1,4 @@
-﻿module Matrosov.Codingame.Easy.ChuckNorris
+﻿module Matrosov.Codingame.FSharp.Easy.ChuckNorris
 
 open System
 

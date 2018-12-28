@@ -1,4 +1,4 @@
-﻿module Matrosov.Codingame.Hard.VoxCodeiEpisode1
+﻿module Matrosov.Codingame.FSharp.Hard.VoxCodeiEpisode1
 
 open System
 

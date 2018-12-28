@@ -1,4 +1,4 @@
-﻿module Matrosov.Codingame.Easy.SkynetTheChasm
+﻿module Matrosov.Codingame.FSharp.Easy.SkynetTheChasm
 
 open System
 
