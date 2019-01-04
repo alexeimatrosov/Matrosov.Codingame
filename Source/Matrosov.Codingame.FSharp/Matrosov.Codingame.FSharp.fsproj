@@ -64,6 +64,7 @@
     <Compile Include="Hard\BenderEpisode3.fs" />
     <Compile Include="Hard\CgxFormatter.fs" />
     <Compile Include="Hard\GenomeSequencing.fs" />
+    <Compile Include="Hard\PowerOfThorEpisode2.fs" />
     <Compile Include="Hard\RollerCoaster.fs" />
     <Compile Include="Hard\SkynetTheBridge.fs" />
     <Compile Include="Hard\SuperComputer.fs" />
