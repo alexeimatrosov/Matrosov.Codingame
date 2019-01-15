@@ -35,12 +35,12 @@ let enumerateCells predicate (grid : char[,]) =
     }
 
 let enumerateBlastingCells (x, y) (grid : char[,]) =
-    let rec aux x y xInc yInc xLimit yLimit =
+    let rec aux x y dx dy xLimit yLimit =
         seq {
             if 0 <= x && x < width && 0 <= y && y < height && grid.[y,x] |> isBlock |> not
             then
                 yield (x, y)
-                if x <> xLimit || y <> yLimit then yield! aux (x+xInc) (y+yInc) xInc yInc xLimit yLimit
+                if x <> xLimit || y <> yLimit then yield! aux (x+dx) (y+dy) dx dy xLimit yLimit
         }
     seq {
         yield! aux (x+1) y +1 0 (x+3) y
@@ -139,13 +139,11 @@ let rec solve state =
                     |> Seq.map fst
 
                 yield! emptyCellsWithUniqueNodesClosing
-                       |> Seq.map (fun xy -> solve (state |> play (Some xy)))
+                       |> Seq.map (fun xy -> Some xy)
 
-            if state.NodesClosed.Count > 0
-            then
-                yield solve (state |> play None)
+            if state.NodesClosed.Count > 0 then yield None
         }
-        |> Seq.tryPick id
+        |> Seq.tryPick (fun t -> state |> play t |> solve)
 
 {
     Grid = grid
@@ -160,7 +158,7 @@ let rec solve state =
 |> Option.get
 |> Seq.append [|None|]
 |> Seq.rev
-|> Seq.iter(fun t ->
+|> Seq.iter (fun t ->
     match t with
     | Some (x, y) -> printfn "%d %d" x y
     | None -> printfn "WAIT")

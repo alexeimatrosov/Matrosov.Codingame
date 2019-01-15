@@ -70,6 +70,7 @@
     <Compile Include="Hard\SuperComputer.fs" />
     <Compile Include="Hard\Surface.fs" />
     <Compile Include="Hard\TanNetwork.fs" />
+    <Compile Include="Hard\ThereIsNoSpoonEpisode2.fs" />
     <Compile Include="Hard\VoxCodeiEpisode1.fs" />
     <Content Include="packages.config" />
   </ItemGroup>
