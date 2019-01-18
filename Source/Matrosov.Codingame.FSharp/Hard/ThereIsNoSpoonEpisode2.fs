@@ -22,13 +22,6 @@ let asIntAt xy = valueAt xy >> asInt
 
 let isNode c = '1' <= c && c <= '8'
 
-let enumerateCells predicate (grid : char[,]) =
-    seq {
-        for y = 0 to height-1 do
-            for x = 0 to width-1 do
-                if predicate grid.[y,x] then yield (x, y)
-    }
-
 let copy state =
     {
         Grid = state.Grid |> Array2D.copy
@@ -38,7 +31,7 @@ let copy state =
 
 let hasLink xy xy' state = state.Links.ContainsKey(xy, xy') || state.Links.ContainsKey(xy', xy)
 
-let addLinks (xy, links) state =
+let putLinks (xy, links) state =
     let subtractNodeAmount (x, y) amount =
         state.Grid.[y,x] <- char (int state.Grid.[y,x] - amount)
 
@@ -63,45 +56,47 @@ let addLinks (xy, links) state =
         }
         |> Seq.filter (fun (x, y) -> state.Grid.[y,x] = '0')
         |> Seq.iter (state.NodesOpen.Remove >> ignore))
-    state
 
-let enumerateNeighbours state (x, y) =
-    let rec aux x' y' dx dy =
+let enumeratePossibleMaxLinks state =
+    let enumerateNeighbours (x, y) state =
+        let rec aux x' y' dx dy =
+            seq {
+                yield (x', y')
+                yield! aux (x'+dx) (y'+dy) dx dy
+            }
+
+        let notBlocked c = c <> '-' && c <> '|' && c <> '0'
+
+        let pickNode cells =
+            cells
+            |> Seq.takeWhile (fun (x', y') -> 0 <= x' && x' < width && 0 <= y' && y' < height && state.Grid.[y',x'] |> notBlocked)
+            |> Seq.tryPick (fun (x', y') -> if state.Grid.[y',x'] |> isNode && state |> hasLink (x, y) (x', y') |> not then Some (x', y') else None)
+
         seq {
-            yield (x', y')
-            yield! aux (x'+dx) (y'+dy) dx dy
+            yield aux (x+1) y +1 0 |> pickNode
+            yield aux (x-1) y -1 0 |> pickNode
+            yield aux x (y+1) 0 +1 |> pickNode
+            yield aux x (y-1) 0 -1 |> pickNode
         }
+        |> Seq.choose id
 
-    let notBlocked c = c <> '-' && c <> '|' && c <> '0'
+    let aux xy =
+        let value = state.Grid |> asIntAt xy
+        state
+        |> enumerateNeighbours xy
+        |> Seq.map (fun xy' -> (xy', state.Grid |> asIntAt xy' |> min value |> min 2))
+        |> Array.ofSeq
 
-    let pickNode cells =
-        cells
-        |> Seq.takeWhile (fun (x', y') -> 0 <= x' && x' < width && 0 <= y' && y' < height && state.Grid.[y',x'] |> notBlocked)
-        |> Seq.tryPick (fun (x', y') -> if state.Grid.[y',x'] |> isNode && state |> hasLink (x, y) (x', y') |> not then Some (x', y') else None)
+    state.NodesOpen
+    |> Seq.map (fun xy -> (xy, xy |> aux))
 
-    seq {
-        yield aux (x+1) y +1 0 |> pickNode
-        yield aux (x-1) y -1 0 |> pickNode
-        yield aux x (y+1) 0 +1 |> pickNode
-        yield aux x (y-1) 0 -1 |> pickNode
-    }
-    |> Seq.choose id
-
-let enumeratePossibleMaxLinks state xy =
-    let value = state.Grid |> asIntAt xy
-    enumerateNeighbours state xy
-    |> Seq.map (fun xy' -> (xy', state.Grid |> asIntAt xy' |> min value |> min 2))
-
-let rec playLinks state =
+let rec putKnownLinks state =
     let tryPutFor (xy, possibleLinks) =
         if (state.Grid |> asIntAt xy) = (possibleLinks |> Seq.map snd |> Seq.sum)
         then Some (xy, possibleLinks)
         else None
 
-    let possibleMaxLinks =
-        state.NodesOpen
-        |> Seq.map (fun xy -> (xy, xy |> enumeratePossibleMaxLinks state |> Array.ofSeq))
-        |> Seq.cache
+    let possibleMaxLinks = state |> enumeratePossibleMaxLinks |> Seq.cache
 
     let linksOption =
         match possibleMaxLinks |> Seq.tryPick tryPutFor with
@@ -117,22 +112,26 @@ let rec playLinks state =
     match linksOption with
     | None -> ()
     | Some links -> 
-        state
-        |> addLinks links
-        |> playLinks
+        state |> putLinks links
+        state |> putKnownLinks
 
 let rec solve state =
-    playLinks state
+    putKnownLinks state
 
-    if state.NodesOpen.Count = 0 then Some state
+    let possibleMaxLinks = state |> enumeratePossibleMaxLinks |> Array.ofSeq
+
+    if possibleMaxLinks.Length = 0 then Some state
+    elif possibleMaxLinks |> Array.exists (fun (xy, possibleLinks) -> (state.Grid |> asIntAt xy) > (possibleLinks |> Seq.map snd |> Seq.sum)) then None
     else
-        state.NodesOpen
-        |> Seq.sortByDescending (fun xy -> state.Grid |> valueAt xy)
-        |> Seq.collect (fun xy ->
-            xy
-            |> enumeratePossibleMaxLinks state
-            |> Seq.collect (fun (xy', maxAmount) -> seq {maxAmount .. -1 .. 1} |> Seq.map (fun i -> (xy, [|xy', i|]))))
-        |> Seq.tryPick (fun l -> state |> copy |> addLinks l |> solve)
+        possibleMaxLinks
+        |> Seq.collect (fun (xy, possibleLinks) ->
+            possibleLinks
+            |> Seq.collect (fun (xy', maxAmount) -> seq {maxAmount .. -1 .. 1} |> Seq.map (fun i -> xy, xy', i)))
+        |> Seq.sortByDescending (fun (xy, _, n) -> (state.Grid |> asIntAt xy, n))
+        |> Seq.tryPick (fun (xy, xy', n) ->
+            let stateCopy = state |> copy
+            stateCopy |> putLinks (xy, [|xy', n|])
+            stateCopy |> solve)
 
 let gridInput = Array.init height (fun _ -> readString())
 let grid = Array2D.init height width (fun i j -> gridInput.[i].[j])
@@ -140,7 +139,11 @@ let grid = Array2D.init height width (fun i j -> gridInput.[i].[j])
 {
     Grid = grid
     Links = Dictionary<(int * int) * (int * int), int>()
-    NodesOpen = HashSet<int * int>(grid |> enumerateCells isNode)
+    NodesOpen = HashSet<int * int>(seq {
+        for y = 0 to height-1 do
+            for x = 0 to width-1 do
+                if grid.[y,x] |> isNode then yield (x, y)
+    })
 }
 |> solve
 |> Option.get
