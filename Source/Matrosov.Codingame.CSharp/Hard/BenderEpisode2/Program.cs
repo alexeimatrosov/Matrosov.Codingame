@@ -3,6 +3,7 @@ using System.Linq;
 
 namespace Matrosov.Codingame.CSharp.Hard.BenderEpisode2
 {
+    [Obsolete("Refactoring required")]
     public class Program
     {
         public static void Main()

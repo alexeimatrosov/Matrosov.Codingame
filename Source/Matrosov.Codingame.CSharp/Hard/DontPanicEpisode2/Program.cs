@@ -5,6 +5,7 @@ using System.Linq;
 
 namespace Matrosov.Codingame.CSharp.Hard.DontPanicEpisode2
 {
+    [Obsolete("Refactoring required")]
     public static class Program
     {
         public static void Main()

@@ -4,6 +4,7 @@ using System.Linq;
 
 namespace Matrosov.Codingame.CSharp.Medium.DwarfsOnGiants
 {
+    [Obsolete("Refactoring required")]
     class Program
     {
         static readonly Dictionary<int, Node> Nodes = new Dictionary<int, Node>();

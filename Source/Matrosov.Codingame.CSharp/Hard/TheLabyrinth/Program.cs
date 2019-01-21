@@ -4,6 +4,7 @@ using System.Linq;
 
 namespace Matrosov.Codingame.CSharp.Hard.TheLabyrinth
 {
+    [Obsolete("Refactoring required")]
     public class Program
     {
         public static void Main(string[] args)

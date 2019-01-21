@@ -5,6 +5,7 @@ using System.Text;
 
 namespace Matrosov.Codingame.CSharp.Contests.PlatinumRift
 {
+    [Obsolete("Refactoring required")]
     public class Program
     {
         public static void Main()

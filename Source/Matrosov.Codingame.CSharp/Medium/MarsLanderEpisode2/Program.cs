@@ -4,6 +4,7 @@ using System.Linq;
 
 namespace Matrosov.Codingame.CSharp.Medium.MarsLanderEpisode2
 {
+    [Obsolete("Refactoring required")]
     public class Player
     {
         private const double G = -3.711;

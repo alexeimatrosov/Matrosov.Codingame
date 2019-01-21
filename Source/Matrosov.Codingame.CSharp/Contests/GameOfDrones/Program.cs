@@ -4,6 +4,7 @@ using System.Linq;
 
 namespace Matrosov.Codingame.CSharp.Contests.GameOfDrones
 {
+    [Obsolete("Refactoring required")]
     public class Program
     {
         static void Main()

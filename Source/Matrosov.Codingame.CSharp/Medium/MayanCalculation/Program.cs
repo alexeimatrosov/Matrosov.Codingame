@@ -4,6 +4,7 @@ using System.Linq;
 
 namespace Matrosov.Codingame.CSharp.Medium.MayanCalculation
 {
+    [Obsolete("Refactoring required")]
     public class Program
     {
         static void Main()

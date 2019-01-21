@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace Matrosov.Codingame.CSharp.Medium.Scrabble
 {
+    [Obsolete("Refactoring required")]
     public class Program
     {
         private static readonly Dictionary<char, int> Scores

@@ -4,6 +4,7 @@ using System.Linq;
 
 namespace Matrosov.Codingame.CSharp.Hard.SkynetRevolutionEpisode2
 {
+    [Obsolete("Refactoring required")]
     public class Program
     {
         public static void Main(String[] args)
